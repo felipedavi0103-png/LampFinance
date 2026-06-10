@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Login</title>
 
-    <!-- FAVICON -->
     <link rel="icon" type="image/png" sizes="32x32" href="financial_lamp_logo.png">
     <link rel="icon" type="image/png" sizes="16x16" href="financial_lamp_logo.png">
     <link rel="apple-touch-icon" href="financial_lamp_logo.png">
 
-    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#10b981">
 
@@ -44,88 +42,80 @@
     </style>
 </head>
 
-<!-- 🔥 CORREÇÃO PRINCIPAL DE ESCALA -->
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100
              min-h-screen flex items-center justify-center
-             p-4 sm:p-6 lg:p-10 antialiased text-base">
+             p-4 sm:p-6 antialiased text-base">
 
-<!-- TOAST -->
 <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-<!-- LOADING -->
-<div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6">
-    <div class="flex items-center gap-3 text-3xl sm:text-4xl font-extrabold text-white animate-pulse">
-        <img src="financial_lamp_logo.png" class="w-14 h-14 sm:w-16 sm:h-16">
+<div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6 p-4">
+    <div class="flex items-center gap-3 text-2xl sm:text-4xl font-extrabold text-white animate-pulse">
+        <img src="financial_lamp_logo.png" class="w-12 h-12 sm:w-16 sm:h-16">
         <span>Lamp<span class="text-emerald-500">Finance</span></span>
     </div>
 
-    <div class="flex flex-col items-center space-y-3">
+    <div class="flex flex-col items-center space-y-3 text-center">
         <div class="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-        <p class="text-xl sm:text-2xl font-black tracking-widest text-emerald-400">BEM VINDO!</p>
-        <p class="text-sm text-slate-400">Preparando suas diretrizes financeiras...</p>
+        <p class="text-lg sm:text-2xl font-black tracking-widest text-emerald-400">BEM VINDO!</p>
+        <p class="text-xs sm:text-sm text-slate-400">Preparando suas diretrizes financeiras...</p>
     </div>
 </div>
 
-<!-- LOGIN -->
 <div id="auth-container"
-     class="w-full max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl
-            mx-auto bg-white dark:bg-slate-950
-            p-6 sm:p-8 lg:p-10
-            rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60
-            space-y-6">
+     class="w-full max-w-md mx-auto bg-white dark:bg-slate-950
+            p-5 sm:p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60
+            space-y-6 transition-all duration-300">
 
-    <!-- HEADER -->
-    <div class="text-center space-y-3">
-        <div class="flex flex-col items-center gap-3 text-3xl sm:text-4xl lg:text-5xl font-extrabold">
-            <img src="financial_lamp_logo.png" class="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24">
+    <div class="text-center space-y-2">
+        <div class="flex flex-col items-center gap-2 text-2xl sm:text-4xl font-extrabold">
+            <img src="financial_lamp_logo.png" class="w-14 h-14 sm:w-20 sm:h-20">
             <span>Lamp<span class="text-emerald-500">Finance</span></span>
         </div>
 
-        <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400">
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
             Acesse sua conta para gerenciar suas finanças
         </p>
     </div>
 
-    <!-- FORM -->
-    <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-5">
+    <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
 
         <div>
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">E-mail</label>
+            <label class="block text-[10px] sm:text-xs font-bold uppercase text-slate-400 mb-1">E-mail</label>
             <input type="email" id="auth-email" required
-                   class="w-full p-4 text-base sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900
+                   class="w-full p-3.5 sm:p-4 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
                           border border-slate-200 dark:border-slate-800
-                          focus:border-emerald-500 outline-none">
+                          focus:border-emerald-500 outline-none transition">
         </div>
 
         <div>
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Senha</label>
+            <label class="block text-[10px] sm:text-xs font-bold uppercase text-slate-400 mb-1">Senha</label>
             <input type="password" id="auth-password" required
-                   class="w-full p-4 text-base sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900
+                   class="w-full p-3.5 sm:p-4 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
                           border border-slate-200 dark:border-slate-800
-                          focus:border-emerald-500 outline-none">
+                          focus:border-emerald-500 outline-none transition">
         </div>
 
         <div id="register-only-fields" class="hidden space-y-4">
             <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Confirmar Senha</label>
+                <label class="block text-[10px] sm:text-xs font-bold uppercase text-slate-400 mb-1">Confirmar Senha</label>
                 <input type="password" id="auth-confirm-password"
-                       class="w-full p-4 text-base sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900
+                       class="w-full p-3.5 sm:p-4 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
                               border border-slate-200 dark:border-slate-800
-                              focus:border-emerald-500 outline-none">
+                              focus:border-emerald-500 outline-none transition">
             </div>
         </div>
 
-        <button type="submit"
-                class="w-full py-4 text-base sm:text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600
-                       text-slate-950 font-bold transition">
+        <button type="submit" id="auth-submit-btn"
+                class="w-full py-3.5 sm:py-4 text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600
+                       text-slate-950 font-bold transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98]">
             Entrar
         </button>
 
     </form>
 
-    <div class="text-center">
-        <button onclick="toggleAuthMode()"
-                class="text-base sm:text-sm text-emerald-500 hover:underline">
+    <div class="text-center pt-2">
+        <button onclick="toggleAuthMode()" id="auth-toggle-btn"
+                class="text-xs sm:text-sm text-emerald-500 hover:underline font-medium">
             Não tem uma conta? Cadastre-se
         </button>
     </div>
@@ -180,9 +170,21 @@ window.handleAuth = async function(e) {
     }
 };
 
+// AJUSTE: Melhorei a função de toggle para atualizar o texto do botão principal dinamicamente também
 window.toggleAuthMode = function() {
     const regFields = document.getElementById("register-only-fields");
-    regFields.classList.toggle("hidden");
+    const submitBtn = document.getElementById("auth-submit-btn");
+    const toggleBtn = document.getElementById("auth-toggle-btn");
+    
+    const isHidden = regFields.classList.toggle("hidden");
+    
+    if (isHidden) {
+        submitBtn.innerText = "Entrar";
+        toggleBtn.innerText = "Não tem uma conta? Cadastre-se";
+    } else {
+        submitBtn.innerText = "Cadastrar";
+        toggleBtn.innerText = "Já tem uma conta? Faça Login";
+    }
 };
 </script>
 
