@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Login</title>
     
-    <!-- 🔥 FAVICON COMPLETO (ABAS + PC + PWA) -->
+    <!-- FAVICON -->
     <link rel="icon" type="image/png" sizes="32x32" href="financial_lamp_logo.png">
     <link rel="icon" type="image/png" sizes="16x16" href="financial_lamp_logo.png">
     <link rel="apple-touch-icon" href="financial_lamp_logo.png">
 
-    <!-- 🔥 PWA -->
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#10b981">
 
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -37,6 +38,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -44,60 +46,78 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 flex items-center justify-center p-4 antialiased">
+<!-- 🔥 AJUSTE PRINCIPAL MOBILE -->
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 sm:p-6 antialiased">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-    <!-- LOADING SCREEN -->
-    <div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6 transition-all duration-500">
-        <div class="flex items-center gap-3 text-4xl font-extrabold tracking-tight text-white animate-pulse">
-            <img src="financial_lamp_logo.png" alt="LampFinance Logo" class="w-14 h-14 drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
+    <!-- LOADING -->
+    <div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6">
+        <div class="flex items-center gap-3 text-3xl sm:text-4xl font-extrabold text-white animate-pulse">
+            <img src="financial_lamp_logo.png" class="w-12 h-12 sm:w-14 sm:h-14">
             <span>Lamp<span class="text-emerald-500">Finance</span></span>
         </div>
+
         <div class="flex flex-col items-center space-y-3">
             <div class="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-            <p class="text-2xl font-black tracking-widest text-emerald-400 uppercase mt-2">BEM VINDO!</p>
-            <p class="text-xs text-slate-400 tracking-wide">Preparando suas diretrizes financeiras...</p>
+            <p class="text-xl sm:text-2xl font-black tracking-widest text-emerald-400">BEM VINDO!</p>
+            <p class="text-xs text-slate-400">Preparando suas diretrizes financeiras...</p>
         </div>
     </div>
 
-    <!-- LOGIN -->
-    <div id="auth-container" class="w-full max-w-md bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60 space-y-6 transition-all duration-300">
+    <!-- LOGIN CONTAINER (CORRIGIDO MOBILE) -->
+    <div id="auth-container"
+         class="w-full max-w-md mx-auto bg-white dark:bg-slate-950
+                p-5 sm:p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60
+                space-y-6">
+
         <div class="text-center space-y-2">
-            <div class="flex flex-col items-center justify-center gap-2 text-3xl font-extrabold tracking-tight">
-                <img src="financial_lamp_logo.png" alt="LampFinance Logo" class="w-16 h-16 drop-shadow-[0_0_12px_rgba(245,158,11,0.4)]">
+            <div class="flex flex-col items-center gap-2 text-2xl sm:text-3xl font-extrabold">
+                <img src="financial_lamp_logo.png" class="w-14 h-14 sm:w-16 sm:h-16">
                 <span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400" id="auth-subtitle">
+
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400" id="auth-subtitle">
                 Acesse sua conta para gerenciar suas finanças
             </p>
         </div>
 
         <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
-                <input type="email" id="auth-email" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">E-mail</label>
+                <input type="email" id="auth-email" required
+                       class="w-full p-3 rounded-xl text-sm bg-slate-50 dark:bg-slate-900
+                              border border-slate-200 dark:border-slate-800 focus:border-emerald-500 outline-none">
             </div>
 
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
-                <input type="password" id="auth-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Senha</label>
+                <input type="password" id="auth-password" required
+                       class="w-full p-3 rounded-xl text-sm bg-slate-50 dark:bg-slate-900
+                              border border-slate-200 dark:border-slate-800 focus:border-emerald-500 outline-none">
             </div>
 
             <div id="register-only-fields" class="hidden space-y-4">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Confirmar Senha</label>
-                    <input type="password" id="auth-confirm-password" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Confirmar Senha</label>
+                    <input type="password" id="auth-confirm-password"
+                           class="w-full p-3 rounded-xl text-sm bg-slate-50 dark:bg-slate-900
+                                  border border-slate-200 dark:border-slate-800 focus:border-emerald-500 outline-none">
                 </div>
             </div>
 
-            <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-300">
+            <button type="submit"
+                    class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600
+                           text-slate-950 font-bold transition">
                 Entrar
             </button>
+
         </form>
 
         <div class="text-center">
-            <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm text-emerald-500 hover:underline font-medium">
+            <button onclick="toggleAuthMode()"
+                    class="text-sm text-emerald-500 hover:underline">
                 Não tem uma conta? Cadastre-se
             </button>
         </div>
@@ -153,9 +173,7 @@ window.handleAuth = async function(e) {
 
 window.toggleAuthMode = function() {
     const regFields = document.getElementById("register-only-fields");
-    const isHidden = regFields.classList.contains("hidden");
-
-    regFields.classList.toggle("hidden", !isHidden);
+    regFields.classList.toggle("hidden");
 };
 </script>
 
