@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Login</title>
 
     <link rel="icon" type="image/png" sizes="32x32" href="financial_lamp_logo.png">
@@ -35,99 +35,119 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Suavização de renderização de fontes típica de Apps nativos */
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        /* Customização dos estados do Input para parecer um programa desktop */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+            -webkit-text-fill-color: #f8fafc !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
     </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100
              min-h-screen flex flex-col items-center justify-center
-             p-4 sm:p-6 antialiased text-base transition-colors duration-300">
-
-    <!-- BOTÃO GLOBAL SIMULAR MOBILE -->
-    <div class="absolute top-4 right-4 flex items-center gap-2 z-50">
-        <button onclick="toggleForceMobileView()" id="btn-force-mobile" class="px-3 py-1.5 flex items-center gap-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold hover:border-emerald-500 transition-all shadow-sm" title="Forçar Visualização Mobile">
-            <i class="fa-solid fa-mobile-screen-button"></i>
-            <span class="hidden sm:inline" id="text-force-mobile">Simular Mobile</span>
-        </button>
-    </div>
+             p-6 antialiased text-base transition-colors duration-500 ease-out select-none">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-    <div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6 p-4">
-        <div class="flex items-center gap-3 text-2xl sm:text-4xl font-extrabold text-white animate-pulse">
-            <img src="financial_lamp_logo.png" class="w-12 h-12 sm:w-16 sm:h-16">
+    <div id="loading-screen" class="fixed inset-0 bg-slate-900/98 backdrop-blur-lg z-50 hidden flex flex-col items-center justify-center space-y-6">
+        <div class="flex items-center gap-3 text-4xl font-extrabold text-white tracking-tight animate-fade-in">
+            <img src="financial_lamp_logo.png" class="w-16 h-16 drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
             <span>Lamp<span class="text-emerald-500">Finance</span></span>
         </div>
 
-        <div class="flex flex-col items-center space-y-3 text-center">
-            <div class="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-            <p class="text-lg sm:text-2xl font-black tracking-widest text-emerald-400">BEM VINDO!</p>
-            <p class="text-xs sm:text-sm text-slate-400">Preparando suas diretrizes financeiras...</p>
+        <div class="flex flex-col items-center space-y-4">
+            <div class="w-48 h-1 bg-slate-800 rounded-full overflow-hidden relative">
+                <div class="absolute inset-y-0 bg-emerald-500 w-1/2 rounded-full animate-[infinity_1.5s_infinite_ease-in-out]" style="animation: dash 1.5s infinite ease-in-out;"></div>
+            </div>
+            <p class="text-xs font-medium tracking-wider text-slate-400 uppercase">Inicializando Diretrizes...</p>
         </div>
     </div>
 
-    <!-- CONTAINER PRINCIPAL -->
     <div id="auth-container"
-         class="w-full max-w-sm mx-auto bg-white dark:bg-slate-950
-                p-6 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60
+         class="w-full max-w-[420px] mx-auto bg-white dark:bg-slate-950
+                p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800/80
                 space-y-6 transition-all duration-300">
 
-        <div class="text-center space-y-2">
-            <div id="auth-logo-wrapper" class="flex flex-col items-center gap-2 text-2xl font-extrabold transition-all">
-                <img id="auth-logo-img" src="financial_lamp_logo.png" class="w-14 h-14 transition-all">
+        <div class="text-center space-y-1.5">
+            <div id="auth-logo-wrapper" class="flex flex-col items-center gap-3 text-3xl font-extrabold tracking-tight">
+                <img id="auth-logo-img" src="financial_lamp_logo.png" class="w-16 h-16 drop-shadow-[0_4px_10px_rgba(34,197,94,0.15)]">
                 <span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
 
-            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
-                Acesse sua conta para gerenciar suas finanças
+            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">
+                Gerenciador Financeiro Corporativo
             </p>
         </div>
 
         <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
             <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">E-mail</label>
-                <input type="email" id="auth-email" required
-                       class="w-full p-3.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
-                              border border-slate-200 dark:border-slate-800
-                              focus:border-emerald-500 outline-none transition">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">E-mail corporativo</label>
+                <input type="email" id="auth-email" required placeholder="nome@empresa.com"
+                       class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50
+                              border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100
+                              placeholder-slate-400 dark:placeholder-slate-600
+                              focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all duration-200">
             </div>
 
             <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Senha</label>
-                <input type="password" id="auth-password" required
-                       class="w-full p-3.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
-                              border border-slate-200 dark:border-slate-800
-                              focus:border-emerald-500 outline-none transition">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">Senha de acesso</label>
+                <input type="password" id="auth-password" required placeholder="••••••••"
+                       class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50
+                              border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100
+                              placeholder-slate-400 dark:placeholder-slate-600
+                              focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all duration-200">
             </div>
 
-            <div id="register-only-fields" class="hidden space-y-4">
+            <div id="register-only-fields" class="hidden opacity-0 transform translate-y-[-10px] transition-all duration-300 ease-out space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Confirmar Senha</label>
-                    <input type="password" id="auth-confirm-password"
-                           class="w-full p-3.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
-                                  border border-slate-200 dark:border-slate-800
-                                  focus:border-emerald-500 outline-none transition">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">Confirmação de Senha</label>
+                    <input type="password" id="auth-confirm-password" placeholder="••••••••"
+                           class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50
+                                  border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100
+                                  placeholder-slate-400 dark:placeholder-slate-600
+                                  focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all duration-200">
                 </div>
             </div>
 
-            <button type="submit" id="auth-submit-btn"
-                    class="w-full py-3.5 text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600
-                           text-slate-950 font-bold transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98]">
-                Entrar
-            </button>
+            <div class="pt-2">
+                <button type="submit" id="auth-submit-btn"
+                        class="w-full py-3.5 text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700
+                               text-slate-950 font-bold tracking-wide transition-all duration-150 shadow-md shadow-emerald-500/10 
+                               active:scale-[0.99] cursor-default flex items-center justify-center gap-2">
+                    <span>Entrar no Sistema</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
         </form>
 
-        <div class="text-center pt-2">
+        <div class="text-center pt-2 border-t border-slate-100 dark:border-slate-900">
             <button onclick="toggleAuthMode()" id="auth-toggle-btn"
-                    class="text-xs text-emerald-500 hover:underline font-medium">
-                Não tem uma conta? Cadastre-se
+                    class="text-xs text-emerald-500 hover:text-emerald-400 font-semibold transition-colors duration-150 cursor-default">
+                Não possui credenciais? Cadastre sua conta
             </button>
         </div>
     </div>
+
+<style>
+    /* Keyframe para a barra de loading do App */
+    @keyframes dash {
+        0% { left: -50%; width: 50%; }
+        50% { left: 25%; width: 40%; }
+        100% { left: 100%; width: 50%; }
+    }
+</style>
 
 <script type="module">
 import { auth, db, initTheme } from "./firebase-config.js";
@@ -137,45 +157,17 @@ import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase
 try {
     initTheme();
 } catch(e) {
-    console.log("Tema inicializado por padrão");
-}
-
-window.applySavedLayoutStates = function() {
-    const isForceMobile = localStorage.getItem("forceMobileView") === "true";
-    const btnMobile = document.getElementById("btn-force-mobile");
-    const textMobile = document.getElementById("text-force-mobile");
-
-    if (isForceMobile) {
-        if (btnMobile) btnMobile.classList.add("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
-        if (textMobile) textMobile.innerText = "Modo Mobile Ativo";
-    } else {
-        if (btnMobile) btnMobile.classList.remove("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
-        if (textMobile) textMobile.innerText = "Simular Mobile";
-    }
-}
-
-window.toggleForceMobileView = function() {
-    const current = localStorage.getItem("forceMobileView") === "true";
-    localStorage.setItem("forceMobileView", !current);
-    window.applySavedLayoutStates();
-};
-
-window.applySavedLayoutStates();
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(e => console.log("SW offline"));
-    });
+    console.log("Tema padrão ativado.");
 }
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("auth-container").classList.add("opacity-0", "scale-95");
         document.getElementById("loading-screen").classList.remove("hidden");
 
         setTimeout(() => {
             window.location.href = "dashboard.html";
-        }, 3000);
+        }, 2000); // Reduzido para 2 segundos para dar sensação de resposta mais ágil do software
     }
 });
 
@@ -208,14 +200,20 @@ window.toggleAuthMode = function() {
     const submitBtn = document.getElementById("auth-submit-btn");
     const toggleBtn = document.getElementById("auth-toggle-btn");
     
-    const isHidden = regFields.classList.toggle("hidden");
-    
-    if (isHidden) {
-        submitBtn.innerText = "Entrar";
-        toggleBtn.innerText = "Não tem uma conta? Cadastre-se";
+    if (regFields.classList.contains("hidden")) {
+        regFields.classList.remove("hidden");
+        setTimeout(() => {
+            regFields.classList.remove("opacity-0", "translate-y-[-10px]");
+        }, 10);
+        submitBtn.innerHTML = `<span>Criar Nova Conta</span> <i class="fa-solid fa-user-plus text-xs"></i>`;
+        toggleBtn.innerText = "Já possui uma conta? Realizar Login";
     } else {
-        submitBtn.innerText = "Cadastrar";
-        toggleBtn.innerText = "Já tem uma conta? Faça Login";
+        regFields.classList.add("opacity-0", "translate-y-[-10px]");
+        setTimeout(() => {
+            regFields.classList.add("hidden");
+        }, 300);
+        submitBtn.innerHTML = `<span>Entrar no Sistema</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+        toggleBtn.innerText = "Não possui credenciais? Cadastre sua conta";
     }
 };
 </script>
