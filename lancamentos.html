@@ -173,7 +173,6 @@
             populateFormDropdowns();
         };
 
-        // MOTOR COMPLETO DE FILTROS CRUZADOS AVANÇADOS (RESOLVIDO)
         window.renderTable = function() {
             const fBanco = document.getElementById("filter-banco").value;
             const fCat = document.getElementById("filter-categoria").value;
@@ -246,7 +245,6 @@
 
         window.triggerBulkDelete = function() { openDeleteModal(null, true); };
 
-        // INTEGRAÇÃO EXCEL COM MOTOR REAL DE VALIDAÇÃO DE CHAVES PLANO DE CONTAS (RESOLVIDO)
         window.importExcel = function(e) {
             const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -261,7 +259,6 @@
                         const catRef = String(row.Categoria || "").trim();
                         const bcRef = String(row.Banco || "").trim();
 
-                        // VALIDAÇÃO ANTI-DADOS CORROMPIDOS: Checa se a categoria e o banco existem na conta
                         const catExists = state.categorias.some(c => c.codigo === catRef);
                         const bcExists = state.bancos.some(b => b.codigo === bcRef);
 
@@ -294,7 +291,6 @@
         };
 
         window.exportExcel = function() {
-            // Pega apenas a base atualmente filtrada pelos seletores da tela
             const fBanco = document.getElementById("filter-banco").value;
             const fCat = document.getElementById("filter-categoria").value;
             const fTipo = document.getElementById("filter-tipo").value;
@@ -336,12 +332,4 @@
         }
     </script>
 </body>
-    <button onclick="toggleAppMode()">
-    <i id="device-icon" class="fa-solid fa-mobile-screen"></i>
-</button>
-    <script type="module">
-import { initUIMode } from "./ui-mode.js";
-initUIMode();
-</script>
-    <script src="ui-controller.js"></script>
 </html>
