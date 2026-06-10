@@ -25,21 +25,21 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; border: 1px solid #334155; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         
-        /* Transição suave para a sidebar encolhendo */
-        .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out; }
+        /* Suavização de movimentação da Sidebar estilo App de Desktop */
+        .sidebar-transition { transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col md:flex-row transition-colors duration-300 antialiased overflow-x-hidden">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased overflow-x-hidden select-none">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
@@ -48,33 +48,23 @@
         <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
     </div>
 
-    <div class="md:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40">
-        <div class="flex items-center gap-2 text-lg font-bold">
-            <i class="fa-solid fa-lightbulb text-amber-500"></i>
-            <span>Lamp<span class="text-emerald-500">Finance</span></span>
-        </div>
-        <button onclick="toggleMobileMenu()" class="text-xl p-2 focus:outline-none text-slate-500 dark:text-slate-400">
-            <i id="mobile-menu-icon" class="fa-solid fa-bars"></i>
-        </button>
-    </div>
-
-    <aside id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:sticky md:flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex-col justify-between h-screen z-50 group">
+    <aside id="sidebar" class="sidebar-transition sticky top-0 flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/80 flex-col justify-between h-screen z-40">
         
-        <button onclick="toggleSidebarCollapse()" class="hidden md:flex absolute -right-3 top-20 bg-emerald-500 text-slate-950 w-6 h-6 rounded-full items-center justify-center text-xs shadow-md border border-emerald-600 hover:bg-emerald-400 transition-all z-50">
+        <button onclick="toggleSidebarCollapse()" class="absolute -right-3 top-8 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 hover:text-emerald-500 dark:hover:text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md border border-slate-200 dark:border-slate-800 transition-all z-50 active:scale-95">
             <i id="collapse-icon" class="fa-solid fa-chevron-left"></i>
         </button>
 
         <div class="p-5 space-y-6 overflow-y-auto flex-1 overflow-x-hidden">
-            <div class="hidden md:flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-4 whitespace-nowrap">
+            <div class="flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-2 whitespace-nowrap">
                 <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]"></i>
-                <span class="sidebar-text">Lamp<span class="text-emerald-500">Finance</span></span>
+                <span class="sidebar-text transition-opacity duration-200">Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
 
             <div class="relative id-workspace-container">
-                <label class="sidebar-text block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 px-1">Ambiente Ativo</label>
-                <select id="workspace-select" onchange="changeWorkspace()" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-semibold focus:outline-none text-slate-700 dark:text-slate-200 cursor-pointer transition">
-                    <option value="empresa">🏢 <span class="sidebar-text">Perfil Empresa</span></option>
-                    <option value="pessoal">👤 <span class="sidebar-text">Perfil Pessoal</span></option>
+                <label class="sidebar-text block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-1">Ambiente Ativo</label>
+                <select id="workspace-select" onchange="changeWorkspace()" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-semibold focus:outline-none text-slate-700 dark:text-slate-200 cursor-default transition-all">
+                    <option value="empresa">🏢 Perfil Empresa</option>
+                    <option value="pessoal">👤 Perfil Pessoal</option>
                 </select>
             </div>
 
@@ -82,111 +72,107 @@
                 <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all" title="Dashboard">
                     <i class="fa-solid fa-chart-pie w-5 text-center text-base"></i> <span class="sidebar-text">Dashboard</span>
                 </a>
-                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all" title="Lançamentos">
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-150" title="Lançamentos">
                     <i class="fa-solid fa-receipt w-5 text-center text-base"></i> <span class="sidebar-text">Lançamentos</span>
                 </a>
-                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all" title="Configurações">
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-150" title="Configurações">
                     <i class="fa-solid fa-sliders w-5 text-center text-base"></i> <span class="sidebar-text">Configurações</span>
                 </a>
-                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all" title="DRE Dinâmico">
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-150" title="DRE Dinâmico">
                     <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-base"></i> <span class="sidebar-text">DRE Dinâmico</span>
                 </a>
-                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all" title="Painel Admin">
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all duration-150" title="Painel Admin">
                     <i class="fa-solid fa-shield-halved w-5 text-center text-base"></i> <span class="sidebar-text">Painel Admin</span>
                 </a>
             </nav>
         </div>
 
         <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2 text-xs text-slate-400 dark:text-slate-500">
-            <div class="flex justify-between items-center w-full min-w-0">
-                <span id="sync-status" class="sidebar-text truncate">Sincronizado</span>
-                <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1" title="Sair"><i class="fa-solid fa-right-from-bracket text-base md:text-xs"></i> <span class="sidebar-text">Sair</span></button>
+            <div class="flex justify-between items-center w-full min-w-0 px-1">
+                <span id="sync-status" class="sidebar-text truncate font-medium">Sincronizado</span>
+                <button onclick="handleLogout()" class="hover:text-rose-500 transition-colors duration-150 flex items-center gap-1.5 font-medium" title="Sair do Sistema">
+                    <i class="fa-solid fa-right-from-bracket text-xs"></i> 
+                    <span class="sidebar-text">Sair</span>
+                </button>
             </div>
         </div>
     </aside>
 
-    <div id="sidebar-backdrop" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 md:hidden"></div>
-
-    <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 flex justify-between items-center">
-            <h2 class="text-sm sm:text-lg font-bold tracking-tight">Dashboard Geral de BI</h2>
-            <div class="flex items-center gap-2 sm:gap-4">
-                
-                <button onclick="toggleForceMobileView()" id="btn-force-mobile" class="px-3 py-1.5 flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold hover:border-emerald-500 transition-all" title="Forçar Visualização Mobile">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                    <span class="hidden sm:inline" id="text-force-mobile">Simular Mobile</span>
-                </button>
-
-                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all">
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center">
+            <h2 class="text-base font-bold tracking-tight text-slate-800 dark:text-slate-200">Dashboard Geral de BI</h2>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 hover:border-emerald-500/30 transition-all duration-150 active:scale-95">
                     <i id="theme-icon" class="fa-solid fa-moon"></i>
                 </button>
-                <span id="user-display-email" class="text-[10px] sm:text-xs font-medium text-slate-400 truncate max-w-[100px] sm:max-w-none">Carregando usuário...</span>
+                <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+                <span id="user-display-email" class="text-xs font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Carregando usuário...</span>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Receitas Totais</div>
-                    <div id="kpi-receitas" class="text-lg sm:text-xl font-extrabold text-emerald-500 mt-1">R$ 0,00</div>
+        <main class="flex-1 overflow-y-auto p-8 space-y-6">
+            <div class="grid grid-cols-4 gap-5">
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Receitas Totais</div>
+                    <div id="kpi-receitas" class="text-2xl font-extrabold text-emerald-500 mt-1">R$ 0,00</div>
                 </div>
-                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Despesas Totais</div>
-                    <div id="kpi-despesas" class="text-lg sm:text-xl font-extrabold text-rose-500 mt-1">R$ 0,00</div>
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Despesas Totais</div>
+                    <div id="kpi-despesas" class="text-2xl font-extrabold text-rose-500 mt-1">R$ 0,00</div>
                 </div>
-                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Saldo Operacional</div>
-                    <div id="kpi-resultado" class="text-lg sm:text-xl font-extrabold mt-1">R$ 0,00</div>
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Saldo Operacional</div>
+                    <div id="kpi-resultado" class="text-2xl font-extrabold mt-1">R$ 0,00</div>
                 </div>
-                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Margem de Lucro</div>
-                    <div id="kpi-margem" class="text-lg sm:text-xl font-extrabold text-indigo-500 mt-1">0.0%</div>
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Margem de Lucro</div>
+                    <div id="kpi-margem" class="text-2xl font-extrabold text-indigo-500 mt-1">0.0%</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="charts-wrapper">
-                <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between">
+            <div class="grid grid-cols-2 gap-6" id="charts-wrapper">
+                <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between transition-all hover:shadow-md">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo Mensal de Caixa</h4>
+                        <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Fluxo Mensal de Caixa</h4>
                         <div class="relative inline-block text-left">
-                            <button onclick="toggleDropdown('drop-chart-1')" class="text-slate-400 hover:text-slate-200 text-xs"><i class="fa-solid fa-gear"></i></button>
+                            <button onclick="toggleDropdown('drop-chart-1')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors text-xs"><i class="fa-solid fa-gear"></i></button>
                             <div id="drop-chart-1" class="hidden absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-10 py-1 text-xs">
-                                <button onclick="changeChartType('global', 'line')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Linhas</button>
-                                <button onclick="changeChartType('global', 'bar')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Barras</button>
+                                <button onclick="changeChartType('global', 'line')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Linhas</button>
+                                <button onclick="changeChartType('global', 'bar')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Barras</button>
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 relative min-h-0 w-full overflow-x-auto"><canvas id="canvas-chart-global"></canvas></div>
+                    <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-global"></canvas></div>
                 </div>
 
-                <div id="card-chart-bancos" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between">
+                <div id="card-chart-bancos" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between transition-all hover:shadow-md">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo por Instituição Bancária</h4>
+                        <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Fluxo por Instituição Bancária</h4>
                         <div class="relative inline-block text-left">
-                            <button onclick="toggleDropdown('drop-chart-2')" class="text-slate-400 hover:text-slate-200 text-xs"><i class="fa-solid fa-gear"></i></button>
+                            <button onclick="toggleDropdown('drop-chart-2')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors text-xs"><i class="fa-solid fa-gear"></i></button>
                             <div id="drop-chart-2" class="hidden absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-10 py-1 text-xs">
-                                <button onclick="changeChartType('bancos', 'bar')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Barras</button>
-                                <button onclick="changeChartType('bancos', 'pie')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Pizza</button>
-                                <button onclick="changeChartType('bancos', 'doughnut')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Rosca</button>
+                                <button onclick="changeChartType('bancos', 'bar')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Barras</button>
+                                <button onclick="changeChartType('bancos', 'pie')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Pizza</button>
+                                <button onclick="changeChartType('bancos', 'doughnut')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Rosca</button>
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 relative min-h-0 w-full overflow-x-auto"><canvas id="canvas-chart-bancos"></canvas></div>
+                    <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-bancos"></canvas></div>
                 </div>
 
-                <div id="card-chart-categorias" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between lg:col-span-2">
+                <div id="card-chart-categorias" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between col-span-2 transition-all hover:shadow-md">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Distribuição Gerencial de Despesas</h4>
+                        <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Distribuição Gerencial de Despesas</h4>
                         <div class="relative inline-block text-left">
-                            <button onclick="toggleDropdown('drop-chart-3')" class="text-slate-400 hover:text-slate-200 text-xs"><i class="fa-solid fa-gear"></i></button>
+                            <button onclick="toggleDropdown('drop-chart-3')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors text-xs"><i class="fa-solid fa-gear"></i></button>
                             <div id="drop-chart-3" class="hidden absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-10 py-1 text-xs">
-                                <button onclick="changeChartType('categorias', 'pie')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Pizza</button>
-                                <button onclick="changeChartType('categorias', 'doughnut')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Rosca</button>
-                                <button onclick="changeChartType('categorias', 'bar')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Barras</button>
+                                <button onclick="changeChartType('categorias', 'pie')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Pizza</button>
+                                <button onclick="changeChartType('categorias', 'doughnut')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Rosca</button>
+                                <button onclick="changeChartType('categorias', 'bar')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Barras</button>
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 relative min-h-0 w-full overflow-x-auto"><canvas id="canvas-chart-categorias"></canvas></div>
+                    <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-categorias"></canvas></div>
                 </div>
             </div>
         </main>
@@ -203,90 +189,48 @@
         let charts = { global: null, bancos: null, categorias: null };
         let chartTypes = { global: 'line', bancos: 'bar', categorias: 'pie' };
 
-        // 1. ENGINE DE AUTO-APLICAÇÃO DOS ESTADOS SALVOS (MINIMIZADO E MODO MOBILE)
+        // SISTEMA DE MINIMIZAÇÃO EXCLUSIVA DE DESKTOP
         function applySavedLayoutStates() {
             const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
-            const isForceMobile = localStorage.getItem("forceMobileView") === "true";
-            
             const sidebar = document.getElementById("sidebar");
             const collapseIcon = document.getElementById("collapse-icon");
             const texts = document.querySelectorAll(".sidebar-text");
-            const chartsWrapper = document.getElementById("charts-wrapper");
+            const workspaceSelect = document.getElementById("workspace-select");
 
-            // Aplica estado minimizado (apenas faz efeito real em telas desktop)
             if (isCollapsed) {
-                sidebar.classList.remove("md:w-64");
-                sidebar.classList.add("md:w-20");
-                if(collapseIcon) collapseIcon.className = "fa-solid fa-chevron-right";
-                texts.forEach(t => t.classList.add("md:hidden"));
-            } else {
-                sidebar.classList.remove("md:w-20");
-                sidebar.classList.add("md:w-64");
-                if(collapseIcon) collapseIcon.className = "fa-solid fa-chevron-left";
-                texts.forEach(t => t.classList.remove("md:hidden"));
-            }
-
-            // Aplica Estado de Simulação Mobile Forçado globalmente
-            const btnMobile = document.getElementById("btn-force-mobile");
-            const textMobile = document.getElementById("text-force-mobile");
-            
-            if (isForceMobile) {
-                if (btnMobile) btnMobile.classList.add("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
-                if (textMobile) textMobile.innerText = "Modo Mobile Ativo";
-                if (chartsWrapper) {
-                    chartsWrapper.classList.remove("lg:grid-cols-2");
-                    document.getElementById("card-chart-categorias").classList.remove("lg:col-span-2");
+                sidebar.classList.remove("w-64");
+                sidebar.classList.add("w-20");
+                if (collapseIcon) collapseIcon.className = "fa-solid fa-chevron-right";
+                texts.forEach(t => t.classList.add("hidden"));
+                if (workspaceSelect) {
+                    workspaceSelect.classList.add("text-center", "p-1");
+                    workspaceSelect.options[0].text = "🏢";
+                    workspaceSelect.options[1].text = "👤";
                 }
             } else {
-                if (btnMobile) btnMobile.classList.remove("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
-                if (textMobile) textMobile.innerText = "Simular Mobile";
-                if (chartsWrapper) {
-                    chartsWrapper.classList.add("lg:grid-cols-2");
-                    document.getElementById("card-chart-categorias").classList.add("lg:col-span-2");
+                sidebar.classList.remove("w-20");
+                sidebar.wClass = sidebar.classList.add("w-64");
+                if (collapseIcon) collapseIcon.className = "fa-solid fa-chevron-left";
+                texts.forEach(t => t.classList.remove("hidden"));
+                if (workspaceSelect) {
+                    workspaceSelect.classList.remove("text-center", "p-1");
+                    workspaceSelect.options[0].text = "🏢 Perfil Empresa";
+                    workspaceSelect.options[1].text = "👤 Perfil Pessoal";
                 }
             }
         }
 
-        // 2. TRIGGER DO BOTÃO MINIMIZAR SIDEBAR
         window.toggleSidebarCollapse = function() {
             const current = localStorage.getItem("sidebarCollapsed") === "true";
             localStorage.setItem("sidebarCollapsed", !current);
             applySavedLayoutStates();
-            setTimeout(() => renderCharts(), 310); // Aguarda a transição CSS acabar para recalcular o tamanho dos gráficos
-        };
-
-        // 3. TRIGGER DO BOTÃO GLOBAL DE SIMULAR MOBILE
-        window.toggleForceMobileView = function() {
-            const current = localStorage.getItem("forceMobileView") === "true";
-            localStorage.setItem("forceMobileView", !current);
-            applySavedLayoutStates();
-            renderCharts();
-        };
-
-        // CONTROLE DA SIDEBAR FLUTUANTE EM DISPOSITIVOS MÓVEIS REAIS
-        window.toggleMobileMenu = function() {
-            const sidebar = document.getElementById("sidebar");
-            const backdrop = document.getElementById("sidebar-backdrop");
-            const icon = document.getElementById("mobile-menu-icon");
-            const isOpen = sidebar.classList.contains("translate-x-0");
-            
-            if (isOpen) {
-                sidebar.classList.remove("translate-x-0");
-                sidebar.classList.add("-translate-x-full");
-                backdrop.classList.add("hidden");
-                icon.className = "fa-solid fa-bars";
-            } else {
-                sidebar.classList.remove("-translate-x-full");
-                sidebar.classList.add("translate-x-0");
-                backdrop.classList.remove("hidden");
-                icon.className = "fa-solid fa-xmark";
-            }
+            setTimeout(() => renderCharts(), 260); // Redesenha os gráficos de BI sincronizado ao término da transição CSS
         };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
             
-            applySavedLayoutStates(); // Garante a consistência do layout assim que a página renderizar
+            applySavedLayoutStates();
 
             const impUid = sessionStorage.getItem("impersonatedUid");
             if (impUid && user.email === ADMIN_EMAIL) {
@@ -323,14 +267,14 @@
             document.getElementById("kpi-receitas").innerText = `R$ ${rec.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById("kpi-despesas").innerText = `R$ ${desp.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById("kpi-resultado").innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById("kpi-resultado").className = `text-lg sm:text-xl font-extrabold ${saldo >= 0 ? 'text-emerald-500':'text-rose-500'}`;
+            document.getElementById("kpi-resultado").className = `text-2xl font-extrabold ${saldo >= 0 ? 'text-emerald-500':'text-rose-500'}`;
             document.getElementById("kpi-margem").innerText = rec > 0 ? ((saldo / rec) * 100).toFixed(1) + "%" : "0.0%";
         }
 
         window.renderCharts = function() {
             const isDark = document.documentElement.classList.contains("dark");
             const textColor = isDark ? "#94a3b8" : "#475569";
-            const gridColor = isDark ? "#334155" : "#e2e8f0";
+            const gridColor = isDark ? "#1e293b" : "#e2e8f0";
 
             // Chart 1: Global Flow
             if (charts.global) charts.global.destroy();
@@ -372,10 +316,6 @@
             // Chart 3: Categorias Donut/Pie
             if (charts.categorias) charts.categorias.destroy();
             const cDesp = state.categorias.filter(c => c.tipo === "despesa");
-            
-            // Layout de legenda fluído caso o modo mobile forçado esteja ativo
-            const isForceMobile = localStorage.getItem("forceMobileView") === "true";
-            const legendPosition = (window.innerWidth < 640 || isForceMobile) ? 'bottom' : 'right';
 
             charts.categorias = new Chart(document.getElementById("canvas-chart-categorias"), {
                 type: chartTypes.categorias,
@@ -383,7 +323,7 @@
                     labels: cDesp.map(c => c.nome),
                     datasets: [{ data: cDesp.map(c => state.transacoes.filter(t => t.categoria === c.codigo).reduce((acc,curr)=>acc+curr.valor,0)), backgroundColor: ["#a855f7","#ec4899","#ef4444","#eab308","#3b82f6","#14b8a6"] }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: legendPosition, labels: { color: textColor } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: textColor } } } }
             });
         };
 
