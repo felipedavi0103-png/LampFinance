@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LampFinance - DRE Dinâmico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300">
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <div id="support-banner" class="hidden fixed top-0 left-0 right-0 bg-amber-500 text-slate-950 font-semibold px-4 py-2 text-center text-sm shadow-md z-50 flex items-center justify-center gap-3">
+        <span>⚠️ <strong>MODO SUPORTE:</strong> Editando a conta de <span id="support-user-email" class="underline font-bold"></span>.</span>
+        <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair</button>
+    </div>
+
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0">
+        <div class="p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
+                <a href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+            <span>Sincronizado</span>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center">
+            <h2 class="text-lg font-bold">Demonstração de Performance Contábil</h2>
+            <div class="flex items-center gap-3 text-xs">
+                <label class="font-bold text-slate-400 uppercase">Exercício:</label>
+                <select id="dre-select-ano" onchange="renderDRE()" class="bg-slate-100 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-800 dark:text-slate-100">
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+        </header>
+
+        <main class="p-8 space-y-6">
+            <div id="dre-insight-card" class="p-6 rounded-2xl border transition-all duration-300"></div>
+
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h3 class="text-base font-bold text-center border-b dark:border-slate-800 pb-4 tracking-wider uppercase">DRE Estruturado</h3>
+                <div class="space-y-2 font-mono text-xs max-w-4xl mx-auto">
+                    <div class="flex justify-between p-3 bg-emerald-500/10 text-emerald-500 font-bold rounded-xl border-l-4 border-emerald-500">
+                        <span>(+) RECEITAS OPERACIONAIS BRUTAS</span>
+                        <span id="dre-val-receitas">R$ 0,00</span>
+                    </div>
+                    <div id="dre-container-receitas" class="pl-6 space-y-1 text-slate-500"></div>
+
+                    <div class="flex justify-between p-3 bg-rose-500/10 text-rose-500 font-bold rounded-xl border-l-4 border-rose-500 mt-4">
+                        <span>(-) CUSTOS E DESPESAS OPERACIONAIS</span>
+                        <span id="dre-val-despesas">R$ 0,00</span>
+                    </div>
+                    <div id="dre-container-despesas" class="pl-6 space-y-1 text-slate-500"></div>
+
+                    <hr class="border-slate-200 dark:border-slate-800 my-4">
+                    <div id="dre-resultado-box" class="flex justify-between p-4 rounded-xl text-sm font-bold">
+                        <span>(=) RESULTADO LÍQUIDO DO EXERCÍCIO</span>
+                        <span id="dre-val-resultado">R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        initTheme();
+        let state = { transacoes: [], bancos: [], categorias: [] };
+        let targetUid = "";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "index.html"; return; }
+            
+            const impUid = sessionStorage.getItem("impersonatedUid");
+            if (impUid && user.email === ADMIN_EMAIL) {
+                document.getElementById("support-banner").classList.remove("hidden");
+                document.getElementById("support-user-email").innerText = sessionStorage.getItem("impersonatedEmail");
+            }
+
+            if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel-btn").classList.remove("hidden");
+            
+            targetUid = impUid || user.uid;
+            await loadData();
+        });
+
+        async function loadData() {
+            const workspace = localStorage.getItem("workspace") || "empresa";
+            const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
+            if (docSnap.exists()) {
+                state = docSnap.data();
+                renderDRE();
+            }
+        }
+
+        window.renderDRE = function() {
+            const ano = document.getElementById("dre-select-ano").value;
+            const txAno = state.transacoes.filter(t => t.data.startsWith(ano));
+
+            const totalRec = txAno.filter(t => t.tipo === "receita").reduce((acc, c) => acc + c.valor, 0);
+            const totalDesp = txAno.filter(t => t.tipo === "despesa").reduce((acc, c) => acc + c.valor, 0);
+            const resultado = totalRec - totalDesp;
+
+            document.getElementById("dre-val-receitas").innerText = `R$ ${totalRec.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById("dre-val-despesas").innerText = `R$ ${totalDesp.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById("dre-val-resultado").innerText = `R$ ${resultado.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+
+            const resBox = document.getElementById("dre-resultado-box");
+            if (resultado >= 0) {
+                resBox.className = "flex justify-between p-4 rounded-xl text-sm font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20";
+            } else {
+                resBox.className = "flex justify-between p-4 rounded-xl text-sm font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20";
+            }
+
+            const containerR = document.getElementById("dre-container-receitas");
+            const containerD = document.getElementById("dre-container-despesas");
+            containerR.innerHTML = ""; containerD.innerHTML = "";
+
+            let topReceita = { nome: "Sem registros", valor: 0 };
+            let topDespesa = { nome: "Sem registros", valor: 0 };
+
+            state.categorias.forEach(cat => {
+                const totalCat = txAno.filter(t => t.categoria === cat.codigo).reduce((acc,c) => acc+c.valor, 0);
+                if (totalCat > 0) {
+                    const rowHtml = `<div class="flex justify-between py-2 border-b dark:border-slate-800/40"><span>${cat.codigo} - ${cat.nome}</span> <span>R$ ${totalCat.toLocaleString('pt-BR', {minimumFractionDigits:2})}</span></div>`;
+                    if (cat.tipo === "receita") {
+                        containerR.innerHTML += rowHtml;
+                        if (totalCat > topReceita.valor) topReceita = { nome: cat.nome, valor: totalCat };
+                    } else {
+                        containerD.innerHTML += rowHtml;
+                        if (totalCat > topDespesa.valor) topDespesa = { nome: cat.nome, valor: totalCat };
+                    }
+                }
+            });
+
+            const insightCard = document.getElementById("dre-insight-card");
+            if (resultado >= 0) {
+                insightCard.className = "p-6 rounded-2xl border bg-emerald-500/5 border-emerald-500/20 space-y-3";
+                insightCard.innerHTML = `
+                    <div class="text-emerald-500 font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> RESULTADO FINANCEIRO POSITIVO</div>
+                    <div class="text-xs text-slate-400 space-y-1">
+                        <p>Sua gestão operacional apurou superávit no ano de ${ano}.</p>
+                        <p><strong class="text-emerald-500">Ponto Forte:</strong> A maior receita veio de <strong>"${topReceita.nome}"</strong> somando R$ ${topReceita.valor.toLocaleString('pt-BR')}.</p>
+                        <p><strong class="text-amber-500">Maior Custo:</strong> A conta de <strong>"${topDespesa.nome}"</strong> foi o maior dreno, com R$ ${topDespesa.valor.toLocaleString('pt-BR')}.</p>
+                    </div>`;
+            } else {
+                insightCard.className = "p-6 rounded-2xl border bg-rose-500/5 border-rose-500/20 space-y-3";
+                insightCard.innerHTML = `
+                    <div class="text-rose-500 font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> RESULTADO FINANCEIRO NEGATIVO</div>
+                    <div class="text-xs text-slate-400 space-y-1">
+                        <p>Alerta Crítico! As despesas superaram as entradas no ano de ${ano}.</p>
+                        <p><strong class="text-rose-500">Ponto Crítico:</strong> O maior dreno de caixa foi <strong>"${topDespesa.nome}"</strong> totalizando R$ ${topDespesa.valor.toLocaleString('pt-BR')}.</p>
+                    </div>`;
+            }
+        };
+
+        window.exitImpersonation = function() {
+            sessionStorage.removeItem("impersonatedUid");
+            sessionStorage.removeItem("impersonatedEmail");
+            window.location.href = "admin.html";
+        };
+    </script>
+</body>
+</html>

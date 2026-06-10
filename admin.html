@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LampFinance - Console Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300">
+
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0">
+        <div class="p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
+                <a href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
+                <a href="admin.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 bg-amber-500/5"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center">
+            <h2 class="text-lg font-bold text-amber-500">Console de Auditoria SaaS</h2>
+        </header>
+
+        <main class="p-8">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-100 dark:bg-slate-900 text-slate-400 font-bold uppercase">
+                            <tr>
+                                <th class="p-4">UID do Usuário</th>
+                                <th class="p-4">E-mail Cadastrado</th>
+                                <th class="p-4 text-center">Ação de Suporte</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-admin-users" class="divide-y divide-slate-100 dark:divide-slate-800/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        initTheme();
+
+        onAuthStateChanged(auth, async (user) => {
+            // ANTI-HACK DE CAMADA ADICIONAL SEPARADA
+            if (!user || user.email !== ADMIN_EMAIL) {
+                window.location.href = "dashboard.html";
+                return;
+            }
+            await loadProfiles();
+        });
+
+        async function loadProfiles() {
+            const querySnapshot = await getDocs(collection(db, "users_profiles"));
+            const tbody = document.getElementById("tbody-admin-users");
+            
+            let html = "";
+            querySnapshot.forEach((doc) => {
+                const u = doc.data();
+                if(u.email !== ADMIN_EMAIL) {
+                    html += `
+                    <tr class="text-slate-300">
+                        <td class="p-4 font-mono">${u.uid}</td>
+                        <td class="p-4 font-bold">${u.email}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="impersonate('${u.uid}', '${u.email}')" class="bg-amber-500 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-amber-600 transition">Inspecionar Conta</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+            tbody.innerHTML = html || `<tr><td colspan="3" class="p-4 text-center text-slate-500">Nenhum cliente cadastrado ainda.</td></tr>`;
+        }
+
+        window.impersonate = function(uid, email) {
+            sessionStorage.setItem("impersonatedUid", uid);
+            sessionStorage.setItem("impersonatedEmail", email);
+            window.location.href = "dashboard.html";
+        };
+    </script>
+</body>
+</html>

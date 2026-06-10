@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LampFinance - Plano de Contas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300">
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0">
+        <div class="p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs text-slate-500">
+            <span id="sync-status">Sincronizado</span>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center">
+            <h2 class="text-lg font-bold">Plano Estrutural de Contas</h2>
+        </header>
+
+        <main class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border dark:border-slate-800/60 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-university text-blue-500"></i> Contas Bancárias</h4>
+                <form onsubmit="addBanco(event)" class="flex gap-2 text-xs">
+                    <input type="text" id="input-bc-codigo" required placeholder="Cód" class="w-20 bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
+                    <input type="text" id="input-bc-nome" required placeholder="Nome do Banco" class="flex-1 bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
+                    <button type="submit" class="bg-blue-600 px-4 rounded-xl font-bold text-white">Criar</button>
+                </form>
+                <ul id="ul-bancos" class="divide-y divide-slate-800 text-xs"></ul>
+            </div>
+
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border dark:border-slate-800/60 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-tags text-purple-500"></i> Categorias</h4>
+                <form onsubmit="addCategoria(event)" class="grid grid-cols-4 gap-2 text-xs">
+                    <input type="text" id="input-cat-codigo" required placeholder="Cód" class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
+                    <select id="input-cat-tipo" class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-white"><option value="receita">Receita</option><option value="despesa">Despesa</option></select>
+                    <input type="text" id="input-cat-nome" required placeholder="Nome" class="col-span-2 bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
+                    <button type="submit" class="col-span-4 bg-purple-600 py-2.5 rounded-xl font-bold text-white">Criar Nova Categoria</button>
+                </form>
+                <ul id="ul-categorias" class="divide-y divide-slate-800 text-xs max-h-48 overflow-y-auto"></ul>
+            </div>
+
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border dark:border-slate-800/60 shadow-sm space-y-4 lg:col-span-2">
+                <h4 class="text-sm font-bold text-amber-500"><i class="fa-solid fa-key"></i> Alterar Minha Senha de Acesso</h4>
+                <form onsubmit="changeUserPassword(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs items-end">
+                    <div><label class="block mb-1 text-slate-400">Nova Senha</label><input type="password" id="input-new-password" required class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl"></div>
+                    <div><label class="block mb-1 text-slate-400">Confirmar Nova Senha</label><input type="password" id="input-confirm-new-password" required class="w-full bg-slate-900 border border-slate-800 p-2.5 rounded-xl"></div>
+                    <button type="submit" class="bg-amber-500 text-slate-950 font-bold py-2.5 rounded-xl">Atualizar Senha</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
+        import { onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        initTheme();
+        let state = { transacoes: [], bancos: [], categorias: [] };
+        let targetUid = ""; let workspace = "";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "index.html"; return; }
+            if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel-btn").classList.remove("hidden");
+            
+            targetUid = sessionStorage.getItem("impersonatedUid") || user.uid;
+            workspace = localStorage.getItem("workspace") || "empresa";
+            if (workspace === "pessoal") document.getElementById("menu-dre-btn").classList.add("hidden");
+            await loadData();
+        });
+
+        async function loadData() {
+            const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
+            if (docSnap.exists()) { state = docSnap.data(); renderLists(); }
+        }
+
+        function renderLists() {
+            document.getElementById("ul-bancos").innerHTML = state.bancos.map(b => `<li class="p-3 flex justify-between"><span>Cód: <strong>${b.codigo}</strong></span><span class="text-slate-400">${b.nome}</span></li>`).join('');
+            document.getElementById("ul-categorias").innerHTML = state.categorias.map(c => `<li class="p-2 flex justify-between"><span>${c.codigo} - ${c.nome}</span><span class="uppercase font-bold ${c.tipo==='receita'?'text-emerald-500':'text-rose-500'}">${c.tipo}</span></li>`).join('');
+        }
+
+        window.addBanco = async function(e) {
+            e.preventDefault();
+            const codigo = document.getElementById("input-bc-codigo").value;
+            state.bancos.push({ codigo, nome: document.getElementById("input-bc-nome").value });
+            await save(); renderLists();
+        };
+
+        window.addCategoria = async function(e) {
+            e.preventDefault();
+            const codigo = document.getElementById("input-cat-codigo").value;
+            state.categorias.push({ codigo, tipo: document.getElementById("input-cat-tipo").value, nome: document.getElementById("input-cat-nome").value });
+            await save(); renderLists();
+        };
+
+        window.changeUserPassword = async function(e) {
+            e.preventDefault();
+            const pass = document.getElementById("input-new-password").value;
+            if(pass !== document.getElementById("input-confirm-new-password").value) { showToast("Senhas não batem!", "error"); return; }
+            try {
+                await updatePassword(auth.currentUser, pass);
+                showToast("Senha atualizada com sucesso!", "success");
+            } catch(e) { showToast("Sessão expirada. Refaça o login.", "error"); }
+        };
+
+        async function save() {
+            await setDoc(doc(db, "users", targetUid, "workspaces", workspace), state);
+            showToast("Plano de contas atualizado!", "success");
+        }
+
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl text-xs font-bold`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

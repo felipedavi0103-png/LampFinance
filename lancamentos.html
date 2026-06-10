@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LampFinance - Lançamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased">
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <div id="delete-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <h3 class="text-lg font-bold text-rose-500 mb-4">Confirmar Exclusão</h3>
+            <p class="text-sm text-slate-400 mb-6">Tem certeza absoluta que deseja remover este(s) item(ns)? Essa ação atualizará a nuvem.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 border dark:border-slate-800 rounded-xl text-sm">Cancelar</button>
+                <button id="confirm-delete-btn" class="px-4 py-2 bg-rose-500 text-white rounded-xl text-sm font-bold">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300">
+        <div class="p-5 space-y-6 overflow-y-auto flex-1">
+            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500"><span id="sync-status">Sincronizado</span></div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center"><h2 class="text-lg font-bold">Gestão de Lançamentos</h2></header>
+
+        <main class="p-8 space-y-6">
+            <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm">
+                <form id="form-add-transacao" onsubmit="addTransaction(event)" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end text-xs">
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Data</label><input type="date" id="input-tx-data" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
+                    <div>
+                        <label class="block text-slate-400 font-bold uppercase mb-1">Tipo</label>
+                        <select id="input-tx-tipo" onchange="populateFormDropdowns()" class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none">
+                            <option value="receita">Receita (+)</option><option value="despesa">Despesa (-)</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Categoria</label><select id="input-tx-categoria" onchange="autoFillCategoryCode()" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></select></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Banco</label><select id="input-tx-banco" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></select></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Descrição</label><input type="text" id="input-tx-descricao" placeholder="Histórico" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Valor</label><input type="number" step="0.01" id="input-tx-valor" placeholder="0,00" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
+                    <input type="hidden" id="input-tx-codigo">
+                    <div class="md:col-span-6 flex justify-end"><button type="submit" class="bg-emerald-500 text-slate-950 font-bold py-2.5 px-6 rounded-xl shadow-md">Lançar Registro</button></div>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="bg-white dark:bg-slate-950 p-4 border dark:border-slate-800 rounded-2xl flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Importar Planilha (.xlsx):</span>
+                    <input type="file" onchange="importExcel(event)" class="text-xs text-slate-400">
+                </div>
+                <button onclick="exportExcel()" class="bg-blue-600 font-bold py-4 rounded-2xl text-white hover:bg-blue-700 transition shadow-md">Exportar Base Filtrada para Excel (.xlsx)</button>
+            </div>
+
+            <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="p-5 border-b dark:border-slate-800 flex flex-wrap gap-4 items-center justify-between">
+                    <h4 class="text-sm font-bold">Histórico de Transações</h4>
+                    <div class="flex flex-wrap gap-3 text-xs">
+                        <select id="filter-banco" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todos os Bancos</option></select>
+                        <select id="filter-categoria" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todas as Categorias</option></select>
+                        <select id="filter-tipo" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400">
+                            <option value="">Todos os Tipos</option><option value="receita">Receitas</option><option value="despesa">Despesas</option>
+                        </select>
+                        <div class="flex items-center gap-1">
+                            <input type="date" id="filter-data-inicio" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-1.5 text-slate-400">
+                            <span class="text-slate-500">a</span>
+                            <input type="date" id="filter-data-fim" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-1.5 text-slate-400">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 font-bold uppercase">
+                            <tr>
+                                <th class="p-4 w-12 text-center"><input type="checkbox" id="master-checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                                <th class="p-4">Data</th><th class="p-4">Tipo</th><th class="p-4">Código</th><th class="p-4">Categoria</th><th class="p-4">Banco</th><th class="p-4">Descrição</th><th class="p-4 text-right">Valor</th><th class="p-4 text-center">% Imp. Mês</th><th class="p-4 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-transacoes" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-950 text-white px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-6 z-40 border border-slate-800 scale-95 opacity-0 pointer-events-none transition-all duration-300">
+        <span class="text-xs font-semibold text-slate-400"><span id="bulk-count">0</span> itens selecionados</span>
+        <button onclick="triggerBulkDelete()" class="bg-rose-600 text-white font-bold text-xs px-4 py-2 rounded-xl transition">Excluir em Lote</button>
+    </div>
+
+    <script type="module">
+        import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        initTheme();
+
+        let state = { transacoes: [], bancos: [], categorias: [] };
+        let targetUid = ""; let workspace = "";
+        let pendingDeleteId = null; let pendingBulkDelete = false;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "index.html"; return; }
+            if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel-btn").classList.remove("hidden");
+            
+            targetUid = sessionStorage.getItem("impersonatedUid") || user.uid;
+            workspace = localStorage.getItem("workspace") || "empresa";
+            if (workspace === "pessoal") document.getElementById("menu-dre-btn").classList.add("hidden");
+
+            await loadData();
+        });
+
+        async function loadData() {
+            const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
+            if (docSnap.exists()) {
+                state = docSnap.data();
+                populateFormDropdowns();
+                renderTable();
+            }
+        }
+
+        window.populateFormDropdowns = function() {
+            const tipo = document.getElementById("input-tx-tipo").value;
+            
+            document.getElementById("input-tx-categoria").innerHTML = state.categorias.filter(c => c.tipo === tipo).map(c => `<option value="${c.codigo}">${c.nome}</option>`).join('');
+            document.getElementById("filter-categoria").innerHTML = '<option value="">Todas as Categorias</option>' + state.categorias.map(c => `<option value="${c.codigo}">${c.codigo} - ${c.nome}</option>`).join('');
+            
+            document.getElementById("input-tx-banco").innerHTML = state.bancos.map(b => `<option value="${b.codigo}">${b.nome}</option>`).join('');
+            document.getElementById("filter-banco").innerHTML = '<option value="">Todos os Bancos</option>' + state.bancos.map(b => `<option value="${b.codigo}">${b.nome}</option>`).join('');
+            
+            autoFillCategoryCode();
+        };
+
+        window.autoFillCategoryCode = function() {
+            document.getElementById("input-tx-codigo").value = document.getElementById("input-tx-categoria").value || "";
+        };
+
+        window.addTransaction = async function(e) {
+            e.preventDefault();
+            state.transacoes.unshift({
+                id: Date.now().toString(),
+                data: document.getElementById("input-tx-data").value,
+                tipo: document.getElementById("input-tx-tipo").value,
+                categoria: document.getElementById("input-tx-codigo").value,
+                banco: document.getElementById("input-tx-banco").value,
+                descricao: document.getElementById("input-tx-descricao").value,
+                valor: parseFloat(document.getElementById("input-tx-valor").value)
+            });
+            await save();
+            renderTable();
+            document.getElementById("form-add-transacao").reset();
+            populateFormDropdowns();
+        };
+
+        // MOTOR COMPLETO DE FILTROS CRUZADOS AVANÇADOS (RESOLVIDO)
+        window.renderTable = function() {
+            const fBanco = document.getElementById("filter-banco").value;
+            const fCat = document.getElementById("filter-categoria").value;
+            const fTipo = document.getElementById("filter-tipo").value;
+            const fIni = document.getElementById("filter-data-inicio").value;
+            const fFim = document.getElementById("filter-data-fim").value;
+
+            let filtradas = state.transacoes.filter(t => {
+                if (fBanco && t.banco !== fBanco) return false;
+                if (fCat && t.categoria !== fCat) return false;
+                if (fTipo && t.tipo !== fTipo) return false;
+                if (fIni && t.data < fIni) return false;
+                if (fFim && t.data > fFim) return false;
+                return true;
+            });
+
+            document.getElementById("tbody-transacoes").innerHTML = filtradas.map(t => {
+                const totalMes = state.transacoes.filter(tx => tx.tipo === "despesa" && tx.data.substring(0,7) === t.data.substring(0,7)).reduce((acc, curr) => acc + curr.valor, 0);
+                const impacto = t.tipo === "despesa" && totalMes > 0 ? ((t.valor / totalMes) * 100).toFixed(1) + "%" : "-";
+
+                return `
+                <tr class="hover:bg-slate-100/5 dark:hover:bg-slate-900/40 transition">
+                    <td class="p-4 text-center"><input type="checkbox" data-id="${t.id}" onclick="toggleBulkActionBar()" class="row-checkbox cursor-pointer"></td>
+                    <td class="p-4">${t.data.split('-').reverse().join('/')}</td>
+                    <td class="p-4 font-bold ${t.tipo==='receita'?'text-emerald-500':'text-rose-500'}">${t.tipo.toUpperCase()}</td>
+                    <td class="p-4 font-mono text-slate-400">${t.categoria}</td>
+                    <td class="p-4 font-semibold">${state.categorias.find(c=>c.codigo===t.categoria)?.nome || 'Outros'}</td>
+                    <td class="p-4">${state.bancos.find(b=>b.codigo===t.banco)?.nome || t.banco}</td>
+                    <td class="p-4 text-slate-400 max-w-xs truncate">${t.descricao}</td>
+                    <td class="p-4 text-right font-bold">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                    <td class="p-4 text-center text-slate-400">${impacto}</td>
+                    <td class="p-4 text-center"><button onclick="openDeleteModal('${t.id}', false)" class="text-rose-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button></td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.openDeleteModal = function(id, isBulk) {
+            pendingDeleteId = id; pendingBulkDelete = isBulk;
+            document.getElementById("delete-modal").classList.remove("hidden");
+        };
+        window.closeDeleteModal = function() { document.getElementById("delete-modal").classList.add("hidden"); };
+
+        document.getElementById("confirm-delete-btn").onclick = async function() {
+            if (pendingBulkDelete) {
+                const ids = Array.from(document.querySelectorAll(".row-checkbox:checked")).map(cb => cb.dataset.id);
+                state.transacoes = state.transacoes.filter(t => !ids.includes(t.id));
+                document.getElementById("master-checkbox").checked = false;
+                toggleBulkActionBar();
+            } else {
+                state.transacoes = state.transacoes.filter(t => t.id !== pendingDeleteId);
+            }
+            closeDeleteModal();
+            await save();
+            renderTable();
+        };
+
+        window.toggleAllCheckboxes = function(master) {
+            document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = master.checked);
+            toggleBulkActionBar();
+        };
+
+        window.toggleBulkActionBar = function() {
+            const count = document.querySelectorAll(".row-checkbox:checked").length;
+            const bar = document.getElementById("bulk-action-bar");
+            if(count > 0) {
+                document.getElementById("bulk-count").innerText = count;
+                bar.classList.remove("opacity-0","pointer-events-none");
+            } else { bar.classList.add("opacity-0","pointer-events-none"); }
+        };
+
+        window.triggerBulkDelete = function() { openDeleteModal(null, true); };
+
+        // INTEGRAÇÃO EXCEL COM MOTOR REAL DE VALIDAÇÃO DE CHAVES PLANO DE CONTAS (RESOLVIDO)
+        window.importExcel = function(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const workbook = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    let importCount = 0;
+                    let rejectedCount = 0;
+
+                    json.forEach(row => {
+                        const catRef = String(row.Categoria || "").trim();
+                        const bcRef = String(row.Banco || "").trim();
+
+                        // VALIDAÇÃO ANTI-DADOS CORROMPIDOS: Checa se a categoria e o banco existem na conta
+                        const catExists = state.categorias.some(c => c.codigo === catRef);
+                        const bcExists = state.bancos.some(b => b.codigo === bcRef);
+
+                        if(row.Data && row.Tipo && row.Valor && catExists && bcExists) {
+                            state.transacoes.push({
+                                id: Date.now().toString() + Math.random(),
+                                data: String(row.Data).trim(),
+                                tipo: String(row.Tipo).toLowerCase().trim(),
+                                categoria: catRef,
+                                banco: bcRef,
+                                descricao: String(row.Descrição || "Lote Excel").trim(),
+                                valor: parseFloat(row.Valor)
+                            });
+                            importCount++;
+                        } else {
+                            rejectedCount++;
+                        }
+                    });
+
+                    await save();
+                    renderTable();
+                    if(rejectedCount > 0) {
+                        showToast(`${importCount} importados. ${rejectedCount} linhas rejeitadas (Cód. Banco/Categoria inválido).`, "error");
+                    } else {
+                        showToast(`${importCount} lançamentos importados com sucesso!`, "success");
+                    }
+                } catch(err) { showToast("Planilha em formato inválido.", "error"); }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        window.exportExcel = function() {
+            // Pega apenas a base atualmente filtrada pelos seletores da tela
+            const fBanco = document.getElementById("filter-banco").value;
+            const fCat = document.getElementById("filter-categoria").value;
+            const fTipo = document.getElementById("filter-tipo").value;
+            const fIni = document.getElementById("filter-data-inicio").value;
+            const fFim = document.getElementById("filter-data-fim").value;
+
+            let filtradas = state.transacoes.filter(t => {
+                if (fBanco && t.banco !== fBanco) return false;
+                if (fCat && t.categoria !== fCat) return false;
+                if (fTipo && t.tipo !== fTipo) return false;
+                if (fIni && t.data < fIni) return false;
+                if (fFim && t.data > fFim) return false;
+                return true;
+            });
+
+            const formatados = filtradas.map(t => ({
+                Data: t.data, Tipo: t.tipo.toUpperCase(), Categoria: t.categoria, Banco: t.banco, Descrição: t.descricao, Valor: t.valor
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(formatados);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Filtro Ativo");
+            XLSX.writeFile(workbook, `LampFinance_Filtrado_${workspace}.xlsx`);
+            showToast("Planilha gerada!", "success");
+        };
+
+        async function save() {
+            await setDoc(doc(db, "users", targetUid, "workspaces", workspace), state);
+            showToast("Dados salvos com sucesso!", "success");
+        }
+
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+    </script>
+</body>
+</html>

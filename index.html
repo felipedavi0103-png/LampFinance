@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LampFinance - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2 family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <div class="w-full max-w-md bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60 space-y-6">
+        <div class="text-center space-y-2">
+            <div class="flex items-center justify-center gap-3 text-3xl font-extrabold tracking-tight">
+                <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]"></i>
+                <span>Lamp<span class="text-emerald-500">Finance</span></span>
+            </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400" id="auth-subtitle">Acesse sua conta para gerenciar suas finanças</p>
+        </div>
+
+        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
+                <input type="email" id="auth-email" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
+                <input type="password" id="auth-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div id="register-only-fields" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Confirmar Senha</label>
+                    <input type="password" id="auth-confirm-password" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
+                </div>
+            </div>
+            <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-300">Entrar</button>
+        </form>
+
+        <div class="text-center">
+            <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm text-emerald-500 hover:underline font-medium">Não tem uma conta? Cadastre-se</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, initTheme } from "./firebase-config.js";
+        import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        initTheme();
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) window.location.href = "dashboard.html";
+        });
+
+        window.handleAuth = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById("auth-email").value.trim();
+            const password = document.getElementById("auth-password").value;
+            const isRegister = document.getElementById("auth-toggle-btn").innerText.includes("Entrar");
+
+            try {
+                if (isRegister) {
+                    const confirm = document.getElementById("auth-confirm-password").value;
+                    if (password !== confirm) { showToast("As senhas não coincidem!", "error"); return; }
+                    const credential = await createUserWithEmailAndPassword(auth, email, password);
+                    await setDoc(doc(db, "users_profiles", credential.user.uid), { uid: credential.user.uid, email: email });
+                    showToast("Conta criada!", "success");
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showToast("Bem-vindo!", "success");
+                }
+            } catch (err) {
+                showToast("Erro na autenticação. Verifique os dados.", "error");
+            }
+        };
+
+        window.toggleAuthMode = function() {
+            const subtitle = document.getElementById("auth-subtitle");
+            const toggleBtn = document.getElementById("auth-toggle-btn");
+            const submitBtn = document.getElementById("auth-submit-btn");
+            const regFields = document.getElementById("register-only-fields");
+
+            if (toggleBtn.innerText.includes("Cadastre-se")) {
+                subtitle.innerText = "Crie sua conta corporativa ou pessoal gratuita";
+                toggleBtn.innerText = "Já possui uma conta? Entre aqui";
+                submitBtn.innerText = "Cadastrar Nova Conta";
+                regFields.classList.remove("hidden");
+                document.getElementById("auth-confirm-password").required = true;
+            } else {
+                subtitle.innerText = "Acesse sua conta para gerenciar suas finanças";
+                toggleBtn.innerText = "Não tem uma conta? Cadastre-se";
+                submitBtn.innerText = "Entrar";
+                regFields.classList.add("hidden");
+                document.getElementById("auth-confirm-password").required = false;
+            }
+        };
+
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
