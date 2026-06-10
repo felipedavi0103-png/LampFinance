@@ -25,7 +25,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -43,23 +43,28 @@
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
+    <!-- BANNER DE SUPORTE -->
     <div id="support-banner" class="hidden fixed top-0 left-0 right-0 bg-amber-500 text-slate-950 font-semibold px-4 py-2.5 text-center text-sm shadow-md z-50 flex items-center justify-center gap-3 transition-all duration-300">
         <span><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> <strong>MODO SUPORTE ATIVO:</strong> Você está editando a conta de <span id="support-user-email" class="underline font-bold"></span>.</span>
         <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
     </div>
 
+    <!-- SIDEBAR EXCLUSIVA DESKTOP COM MICROINTERAÇÕES -->
     <aside id="sidebar" class="sidebar-transition sticky top-0 flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/80 flex-col justify-between h-screen z-40">
         
+        <!-- Botão de Minimizar Lateral -->
         <button onclick="toggleSidebarCollapse()" class="absolute -right-3 top-8 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 hover:text-emerald-500 dark:hover:text-emerald-400 w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md border border-slate-200 dark:border-slate-800 transition-all z-50 active:scale-95">
             <i id="collapse-icon" class="fa-solid fa-chevron-left"></i>
         </button>
 
         <div class="p-5 space-y-6 overflow-y-auto flex-1 overflow-x-hidden">
+            <!-- LOGO -->
             <div class="flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-2 whitespace-nowrap">
                 <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]"></i>
                 <span class="sidebar-text transition-opacity duration-200">Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
 
+            <!-- AMBIENTE ATIVO -->
             <div class="relative id-workspace-container">
                 <label class="sidebar-text block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-1">Ambiente Ativo</label>
                 <select id="workspace-select" onchange="changeWorkspace()" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-semibold focus:outline-none text-slate-700 dark:text-slate-200 cursor-default transition-all">
@@ -68,6 +73,7 @@
                 </select>
             </div>
 
+            <!-- MENU FLUIDO -->
             <nav class="space-y-1">
                 <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all" title="Dashboard">
                     <i class="fa-solid fa-chart-pie w-5 text-center text-base"></i> <span class="sidebar-text">Dashboard</span>
@@ -87,6 +93,7 @@
             </nav>
         </div>
 
+        <!-- FOOTER SIDEBAR -->
         <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2 text-xs text-slate-400 dark:text-slate-500">
             <div class="flex justify-between items-center w-full min-w-0 px-1">
                 <span id="sync-status" class="sidebar-text truncate font-medium">Sincronizado</span>
@@ -98,7 +105,9 @@
         </div>
     </aside>
 
+    <!-- PAINEL CENTRAL DE CONTEÚDO -->
     <div class="flex-1 flex flex-col min-w-0">
+        <!-- HEADER APP -->
         <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center">
             <h2 class="text-base font-bold tracking-tight text-slate-800 dark:text-slate-200">Dashboard Geral de BI</h2>
             <div class="flex items-center gap-4">
@@ -110,7 +119,9 @@
             </div>
         </header>
 
+        <!-- ESPAÇO OPERACIONAL -->
         <main class="flex-1 overflow-y-auto p-8 space-y-6">
+            <!-- KPIS GRID -->
             <div class="grid grid-cols-4 gap-5">
                 <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
                     <div class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Receitas Totais</div>
@@ -130,6 +141,7 @@
                 </div>
             </div>
 
+            <!-- GRÁFICOS INTERATIVOS -->
             <div class="grid grid-cols-2 gap-6" id="charts-wrapper">
                 <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between transition-all hover:shadow-md">
                     <div class="flex justify-between items-center mb-2">
@@ -187,7 +199,7 @@
 
         let state = { transacoes: [], bancos: [], categorias: [] };
         let charts = { global: null, bancos: null, categorias: null };
-        let chartTypes = { global: 'line', bancos: 'bar', categorias: 'pie' };
+        let chartTypes = { global: 'line', bancos: 'bar', categories: 'pie' };
 
         // SISTEMA DE MINIMIZAÇÃO EXCLUSIVA DE DESKTOP
         function applySavedLayoutStates() {
@@ -209,7 +221,7 @@
                 }
             } else {
                 sidebar.classList.remove("w-20");
-                sidebar.wClass = sidebar.classList.add("w-64");
+                sidebar.classList.add("w-64");
                 if (collapseIcon) collapseIcon.className = "fa-solid fa-chevron-left";
                 texts.forEach(t => t.classList.remove("hidden"));
                 if (workspaceSelect) {
