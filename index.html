@@ -86,17 +86,13 @@
 
         initTheme();
 
-        // CONTROLE DO ESCUTADOR DE AUTH COM TIMER DE BOAS-VINDAS DE 3 SEGUNDOS
+        // Escutador de Autenticação com Splash Screen de 3 segundos
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Esconde o container do formulário para evitar cliques duplos
                 document.getElementById("auth-container").classList.add("hidden");
-                
-                // Exibe a tela de carregamento estilizada
                 const loadingScreen = document.getElementById("loading-screen");
                 loadingScreen.classList.remove("hidden");
 
-                // Executa o delay exato de 3000ms antes do redirecionamento de rota
                 setTimeout(() => {
                     window.location.href = "dashboard.html";
                 }, 3000);
@@ -107,7 +103,9 @@
             e.preventDefault();
             const email = document.getElementById("auth-email").value.trim();
             const password = document.getElementById("auth-password").value;
-            const isRegister = document.getElementById("auth-toggle-btn").innerText.includes("Entrar");
+            
+            // Correção aqui: Verifica se a div de registro está visível na tela
+            const isRegister = !document.getElementById("register-only-fields").classList.contains("hidden");
 
             try {
                 if (isRegister) {
@@ -116,18 +114,21 @@
                         showToast("As senhas não coincidem!", "error"); 
                         return; 
                     }
+                    // Executa a criação real do usuário no Firebase Auth
                     const credential = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // Registra o perfil do usuário na coleção para o Painel Admin ler
                     await setDoc(doc(db, "users_profiles", credential.user.uid), { 
                         uid: credential.user.uid, 
                         email: email 
                     });
-                    showToast("Conta criada com sucesso!", "success");
+                    
+                    showToast("Conta criada com sucesso! Entrando...", "success");
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
-                    // O onAuthStateChanged interceptará o sucesso e abrirá o Splash Screen automaticamente
                 }
             } catch (err) {
-                showToast("Erro na autenticação. Verifique os dados inseridos.", "error");
+                showToast("Erro: " + err.message, "error");
             }
         };
 
@@ -159,7 +160,7 @@
             toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300`;
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => toast.remove(), 4000);
         }
     </script>
 </body>
