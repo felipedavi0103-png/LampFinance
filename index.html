@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Login</title>
     
-    <link rel="icon" type="image/png" href="financial_lamp_logo.png">
-    
+    <!-- 🔥 FAVICON COMPLETO (ABAS + PC + PWA) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="financial_lamp_logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="financial_lamp_logo.png">
+    <link rel="apple-touch-icon" href="financial_lamp_logo.png">
+
+    <!-- 🔥 PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#10b981">
 
@@ -29,18 +33,22 @@
             }
         }
     </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 flex items-center justify-center p-4 antialiased">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
+    <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6 transition-all duration-500">
         <div class="flex items-center gap-3 text-4xl font-extrabold tracking-tight text-white animate-pulse">
             <img src="financial_lamp_logo.png" alt="LampFinance Logo" class="w-14 h-14 drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
@@ -53,13 +61,16 @@
         </div>
     </div>
 
+    <!-- LOGIN -->
     <div id="auth-container" class="w-full max-w-md bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60 space-y-6 transition-all duration-300">
         <div class="text-center space-y-2">
             <div class="flex flex-col items-center justify-center gap-2 text-3xl font-extrabold tracking-tight">
                 <img src="financial_lamp_logo.png" alt="LampFinance Logo" class="w-16 h-16 drop-shadow-[0_0_12px_rgba(245,158,11,0.4)]">
                 <span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400" id="auth-subtitle">Acesse sua conta para gerenciar suas finanças</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400" id="auth-subtitle">
+                Acesse sua conta para gerenciar suas finanças
+            </p>
         </div>
 
         <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
@@ -67,110 +78,86 @@
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
                 <input type="email" id="auth-email" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
             </div>
+
             <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
                 <input type="password" id="auth-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
             </div>
+
             <div id="register-only-fields" class="hidden space-y-4">
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Confirmar Senha</label>
                     <input type="password" id="auth-confirm-password" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500 transition">
                 </div>
             </div>
-            <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-300">Entrar</button>
+
+            <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-300">
+                Entrar
+            </button>
         </form>
 
         <div class="text-center">
-            <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm text-emerald-500 hover:underline font-medium">Não tem uma conta? Cadastre-se</button>
+            <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm text-emerald-500 hover:underline font-medium">
+                Não tem uma conta? Cadastre-se
+            </button>
         </div>
     </div>
 
-    <script type="module">
-        import { auth, db, initTheme } from "./firebase-config.js";
-        import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+<script type="module">
+import { auth, db, initTheme } from "./firebase-config.js";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-        initTheme();
+initTheme();
 
-        // REGISTRO DE MOTOR PWA PARA DOWNLOAD DE DESKTOP
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Motor de Área de Trabalho Ativo.'))
-                    .catch(err => console.log('Erro ao carregar motor PWA.'));
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+    });
+}
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("loading-screen").classList.remove("hidden");
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 3000);
+    }
+});
+
+window.handleAuth = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById("auth-email").value.trim();
+    const password = document.getElementById("auth-password").value;
+    const isRegister = !document.getElementById("register-only-fields").classList.contains("hidden");
+
+    try {
+        if (isRegister) {
+            const confirm = document.getElementById("auth-confirm-password").value;
+            if (password !== confirm) return;
+
+            const credential = await createUserWithEmailAndPassword(auth, email, password);
+            await setDoc(doc(db, "users_profiles", credential.user.uid), {
+                uid: credential.user.uid,
+                email: email
             });
+        } else {
+            await signInWithEmailAndPassword(auth, email, password);
         }
+    } catch (err) {
+        console.error(err);
+    }
+};
 
-        // Escutador de Autenticação com Splash Screen de 3 segundos
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById("auth-container").classList.add("hidden");
-                const loadingScreen = document.getElementById("loading-screen");
-                loadingScreen.classList.remove("hidden");
+window.toggleAuthMode = function() {
+    const regFields = document.getElementById("register-only-fields");
+    const isHidden = regFields.classList.contains("hidden");
 
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 3000);
-            }
-        });
+    regFields.classList.toggle("hidden", !isHidden);
+};
+</script>
 
-        window.handleAuth = async function(e) {
-            e.preventDefault();
-            const email = document.getElementById("auth-email").value.trim();
-            const password = document.getElementById("auth-password").value;
-            const isRegister = !document.getElementById("register-only-fields").classList.contains("hidden");
-
-            try {
-                if (isRegister) {
-                    const confirm = document.getElementById("auth-confirm-password").value;
-                    if (password !== confirm) { 
-                        showToast("As senhas não coincidem!", "error"); 
-                        return; 
-                    }
-                    const credential = await createUserWithEmailAndPassword(auth, email, password);
-                    await setDoc(doc(db, "users_profiles", credential.user.uid), { 
-                        uid: credential.user.uid, 
-                        email: email 
-                    });
-                    showToast("Conta criada com sucesso! Entrando...", "success");
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-            } catch (err) {
-                showToast("Erro: " + err.message, "error");
-            }
-        };
-
-        window.toggleAuthMode = function() {
-            const subtitle = document.getElementById("auth-subtitle");
-            const toggleBtn = document.getElementById("auth-toggle-btn");
-            const submitBtn = document.getElementById("auth-submit-btn");
-            const regFields = document.getElementById("register-only-fields");
-
-            if (toggleBtn.innerText.includes("Cadastre-se")) {
-                subtitle.innerText = "Crie sua conta corporativa ou pessoal gratuita";
-                toggleBtn.innerText = "Já possui uma conta? Entre aqui";
-                submitBtn.innerText = "Cadastrar Nova Conta";
-                regFields.classList.remove("hidden");
-                document.getElementById("auth-confirm-password").required = true;
-            } else {
-                subtitle.innerText = "Acesse sua conta para gerenciar suas finanças";
-                toggleBtn.innerText = "Não tem uma conta? Cadastre-se";
-                submitBtn.innerText = "Entrar";
-                regFields.classList.add("hidden");
-                document.getElementById("auth-confirm-password").required = false;
-            }
-        };
-
-        function showToast(message, type = "success") {
-            const container = document.getElementById("toast-container");
-            const toast = document.createElement("div");
-            const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
-            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300`;
-            toast.innerHTML = `<span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
-    </script>
 </body>
 </html>
