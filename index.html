@@ -40,11 +40,8 @@
 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        /* Suavização de renderização de fontes típica de Apps nativos */
         html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-        /* Customização dos estados do Input para parecer um programa desktop */
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus {
@@ -62,16 +59,16 @@
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
     <div id="loading-screen" class="fixed inset-0 bg-slate-900/98 backdrop-blur-lg z-50 hidden flex flex-col items-center justify-center space-y-6">
-        <div class="flex items-center gap-3 text-4xl font-extrabold text-white tracking-tight animate-fade-in">
+        <div class="flex items-center gap-3 text-4xl font-extrabold text-white tracking-tight">
             <img src="financial_lamp_logo.png" class="w-16 h-16 drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
             <span>Lamp<span class="text-emerald-500">Finance</span></span>
         </div>
 
         <div class="flex flex-col items-center space-y-4">
             <div class="w-48 h-1 bg-slate-800 rounded-full overflow-hidden relative">
-                <div class="absolute inset-y-0 bg-emerald-500 w-1/2 rounded-full animate-[infinity_1.5s_infinite_ease-in-out]" style="animation: dash 1.5s infinite ease-in-out;"></div>
+                <div class="absolute inset-y-0 bg-emerald-500 w-1/2 rounded-full" style="animation: dash 1.5s infinite ease-in-out;"></div>
             </div>
-            <p class="text-xs font-medium tracking-wider text-slate-400 uppercase">Inicializando Diretrizes...</p>
+            <p class="text-xs font-medium tracking-wider text-slate-400 uppercase">Acessando Diretrizes...</p>
         </div>
     </div>
 
@@ -94,7 +91,7 @@
         <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">E-mail corporativo</label>
-                <input type="email" id="auth-email" required placeholder="nome@empresa.com"
+                <input type="email" id="auth-email" required placeholder="nome@empresa.com" autocomplete="username"
                        class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50
                               border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100
                               placeholder-slate-400 dark:placeholder-slate-600
@@ -103,7 +100,7 @@
 
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">Senha de acesso</label>
-                <input type="password" id="auth-password" required placeholder="••••••••"
+                <input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password"
                        class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50
                               border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100
                               placeholder-slate-400 dark:placeholder-slate-600
@@ -113,7 +110,7 @@
             <div id="register-only-fields" class="hidden opacity-0 transform translate-y-[-10px] transition-all duration-300 ease-out space-y-4">
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">Confirmação de Senha</label>
-                    <input type="password" id="auth-confirm-password" placeholder="••••••••"
+                    <input type="password" id="auth-confirm-password" placeholder="••••••••" autocomplete="new-password"
                            class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50
                                   border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100
                                   placeholder-slate-400 dark:placeholder-slate-600
@@ -141,7 +138,6 @@
     </div>
 
 <style>
-    /* Keyframe para a barra de loading do App */
     @keyframes dash {
         0% { left: -50%; width: 50%; }
         50% { left: 25%; width: 40%; }
@@ -151,7 +147,7 @@
 
 <script type="module">
 import { auth, db, initTheme } from "./firebase-config.js";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 try {
@@ -160,16 +156,13 @@ try {
     console.log("Tema padrão ativado.");
 }
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        document.getElementById("auth-container").classList.add("opacity-0", "scale-95");
-        document.getElementById("loading-screen").classList.remove("hidden");
-
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 2000); // Reduzido para 2 segundos para dar sensação de resposta mais ágil do software
-    }
-});
+// CORREÇÃO: Força o Firebase a esquecer a sessão assim que fechar a aba ou recarregar
+// Evitando o login automático indesejado.
+try {
+    await setPersistence(auth, browserSessionPersistence);
+} catch (error) {
+    console.error("Erro ao aplicar persistência de sessão:", error);
+}
 
 window.handleAuth = async function(e) {
     e.preventDefault();
@@ -190,6 +183,15 @@ window.handleAuth = async function(e) {
         } else {
             await signInWithEmailAndPassword(auth, email, password);
         }
+
+        // Se a autenticação der certo, mostra o Splash Screen e joga pro dashboard
+        document.getElementById("auth-container").classList.add("opacity-0", "scale-95");
+        document.getElementById("loading-screen").classList.remove("hidden");
+        
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1500);
+
     } catch (err) {
         console.error(err);
     }
