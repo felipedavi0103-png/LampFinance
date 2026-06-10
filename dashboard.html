@@ -36,7 +36,8 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased">
+<!-- CORREÇÃO: flex mudou para flex-col no mobile e md:flex-row no desktop -->
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col md:flex-row transition-colors duration-300 antialiased overflow-x-hidden">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
@@ -45,9 +46,21 @@
         <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
     </div>
 
-    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300">
+    <!-- BOTÃO TOGGLE DA SIDEBAR NO MOBILE -->
+    <div class="md:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40">
+        <div class="flex items-center gap-2 text-lg font-bold">
+            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+            <span>Lamp<span class="text-emerald-500">Finance</span></span>
+        </div>
+        <button onclick="toggleMobileMenu()" class="text-xl p-2 focus:outline-none text-slate-500 dark:text-slate-400">
+            <i id="mobile-menu-icon" class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- CORREÇÃO SIDEBAR: Classes de posicionamento fixo/overlay retrátil para telas pequenas -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:sticky md:flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex-col justify-between h-screen z-50 transition-transform duration-300 ease-in-out">
         <div class="p-5 space-y-6 overflow-y-auto flex-1">
-            <div class="flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-4">
+            <div class="hidden md:flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-4">
                 <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]"></i>
                 <span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
@@ -85,41 +98,49 @@
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center">
-            <h2 class="text-lg font-bold tracking-tight">Dashboard Geral de BI</h2>
-            <div class="flex items-center gap-4">
+    <!-- BACKDROP DA SIDEBAR MOBILE -->
+    <div id="sidebar-backdrop" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 md:hidden"></div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+        <!-- CORREÇÃO HEADER: Ajustado padding lateral no mobile de px-8 para px-4 -->
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 flex justify-between items-center">
+            <h2 class="text-sm sm:text-lg font-bold tracking-tight">Dashboard Geral de BI</h2>
+            <div class="flex items-center gap-3 sm:gap-4">
                 <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all">
                     <i id="theme-icon" class="fa-solid fa-moon"></i>
                 </button>
-                <span id="user-display-email" class="text-xs font-medium text-slate-400">Carregando usuário...</span>
+                <span id="user-display-email" class="text-[10px] sm:text-xs font-medium text-slate-400 truncate max-w-[120px] sm:max-w-none">Carregando usuário...</span>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8 space-y-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Receitas Totais</div>
-                    <div id="kpi-receitas" class="text-xl font-extrabold text-emerald-500">R$ 0,00</div>
+        <!-- CORREÇÃO MAIN CONTAINER: Ajustado padding p-4 no mobile para não achatar e manter respiro -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8">
+            <!-- CARDS KPI: Passaram a empilhar em 1 coluna no mobile automático -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
+                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Receitas Totais</div>
+                    <div id="kpi-receitas" class="text-lg sm:text-xl font-extrabold text-emerald-500 mt-1">R$ 0,00</div>
                 </div>
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Despesas Totais</div>
-                    <div id="kpi-despesas" class="text-xl font-extrabold text-rose-500">R$ 0,00</div>
+                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
+                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Despesas Totais</div>
+                    <div id="kpi-despesas" class="text-lg sm:text-xl font-extrabold text-rose-500 mt-1">R$ 0,00</div>
                 </div>
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Saldo Operacional</div>
-                    <div id="kpi-resultado" class="text-xl font-extrabold">R$ 0,00</div>
+                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
+                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Saldo Operacional</div>
+                    <div id="kpi-resultado" class="text-lg sm:text-xl font-extrabold mt-1">R$ 0,00</div>
                 </div>
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
-                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Margem de Lucro</div>
-                    <div id="kpi-margem" class="text-xl font-extrabold text-indigo-500">0.0%</div>
+                <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
+                    <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Margem de Lucro</div>
+                    <div id="kpi-margem" class="text-lg sm:text-xl font-extrabold text-indigo-500 mt-1">0.0%</div>
                 </div>
             </div>
 
+            <!-- GRÁFICOS: Mudança na altura interna e overflow preventivo para resoluções pequenas -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between">
+                <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo Mensal de Caixa</h4>
+                        <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo Mensal de Caixa</h4>
                         <div class="relative inline-block text-left">
                             <button onclick="toggleDropdown('drop-chart-1')" class="text-slate-400 hover:text-slate-200 text-xs"><i class="fa-solid fa-gear"></i></button>
                             <div id="drop-chart-1" class="hidden absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-10 py-1 text-xs">
@@ -128,12 +149,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-global"></canvas></div>
+                    <div class="flex-1 relative min-h-0 w-full overflow-x-auto"><canvas id="canvas-chart-global"></canvas></div>
                 </div>
 
-                <div id="card-chart-bancos" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between">
+                <div id="card-chart-bancos" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo por Instituição Bancária</h4>
+                        <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo por Instituição Bancária</h4>
                         <div class="relative inline-block text-left">
                             <button onclick="toggleDropdown('drop-chart-2')" class="text-slate-400 hover:text-slate-200 text-xs"><i class="fa-solid fa-gear"></i></button>
                             <div id="drop-chart-2" class="hidden absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-10 py-1 text-xs">
@@ -143,12 +164,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-bancos"></canvas></div>
+                    <div class="flex-1 relative min-h-0 w-full overflow-x-auto"><canvas id="canvas-chart-bancos"></canvas></div>
                 </div>
 
-                <div id="card-chart-categorias" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between lg:col-span-2">
+                <div id="card-chart-categorias" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between lg:col-span-2">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Distribuição Gerencial de Despesas</h4>
+                        <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Distribuição Gerencial de Despesas</h4>
                         <div class="relative inline-block text-left">
                             <button onclick="toggleDropdown('drop-chart-3')" class="text-slate-400 hover:text-slate-200 text-xs"><i class="fa-solid fa-gear"></i></button>
                             <div id="drop-chart-3" class="hidden absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-10 py-1 text-xs">
@@ -158,7 +179,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-categorias"></canvas></div>
+                    <div class="flex-1 relative min-h-0 w-full overflow-x-auto"><canvas id="canvas-chart-categorias"></canvas></div>
                 </div>
             </div>
         </main>
@@ -174,6 +195,27 @@
         let state = { transacoes: [], bancos: [], categorias: [] };
         let charts = { global: null, bancos: null, categorias: null };
         let chartTypes = { global: 'line', bancos: 'bar', categorias: 'pie' };
+
+        // ADICIONADO: Função para controlar abertura e fechamento da sidebar no mobile
+        window.toggleMobileMenu = function() {
+            const sidebar = document.getElementById("sidebar");
+            const backdrop = document.getElementById("sidebar-backdrop");
+            const icon = document.getElementById("mobile-menu-icon");
+            
+            const isOpen = sidebar.classList.contains("translate-x-0");
+            
+            if (isOpen) {
+                sidebar.classList.remove("translate-x-0");
+                sidebar.classList.add("-translate-x-full");
+                backdrop.classList.add("hidden");
+                icon.className = "fa-solid fa-bars";
+            } else {
+                sidebar.classList.remove("-translate-x-full");
+                sidebar.classList.add("translate-x-0");
+                backdrop.classList.remove("hidden");
+                icon.className = "fa-solid fa-xmark";
+            }
+        };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
@@ -213,11 +255,10 @@
             document.getElementById("kpi-receitas").innerText = `R$ ${rec.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById("kpi-despesas").innerText = `R$ ${desp.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById("kpi-resultado").innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById("kpi-resultado").className = `text-xl font-extrabold ${saldo >= 0 ? 'text-emerald-500':'text-rose-500'}`;
+            document.getElementById("kpi-resultado").className = `text-lg sm:text-xl font-extrabold ${saldo >= 0 ? 'text-emerald-500':'text-rose-500'}`;
             document.getElementById("kpi-margem").innerText = rec > 0 ? ((saldo / rec) * 100).toFixed(1) + "%" : "0.0%";
         }
 
-        // RECONSTRUÇÃO DINÂMICA COMPLETA DE ENGINE BI (CHART.JS TYPE ENGINE)
         window.renderCharts = function() {
             const isDark = document.documentElement.classList.contains("dark");
             const textColor = isDark ? "#94a3b8" : "#475569";
@@ -263,13 +304,17 @@
             // Chart 3: Categorias Donut/Pie
             if (charts.categorias) charts.categorias.destroy();
             const cDesp = state.categorias.filter(c => c.tipo === "despesa");
+            
+            // Ajuste responsivo de legenda para o gráfico de pizza/rosca
+            const legendPosition = window.innerWidth < 640 ? 'bottom' : 'right';
+
             charts.categorias = new Chart(document.getElementById("canvas-chart-categorias"), {
                 type: chartTypes.categorias,
                 data: {
                     labels: cDesp.map(c => c.nome),
                     datasets: [{ data: cDesp.map(c => state.transacoes.filter(t => t.categoria === c.codigo).reduce((acc,curr)=>acc+curr.valor,0)), backgroundColor: ["#a855f7","#ec4899","#ef4444","#eab308","#3b82f6","#14b8a6"] }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: textColor } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: legendPosition, labels: { color: textColor } } } }
             });
         };
 
@@ -305,6 +350,11 @@
         window.handleLogout = async function() {
             await signOut(auth);
         };
+
+        // Redesenhar gráficos ao mudar tamanho de tela (muda posições de legenda mobile)
+        window.addEventListener('resize', () => {
+            renderCharts();
+        });
     </script>
 </body>
 </html>
