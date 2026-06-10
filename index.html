@@ -56,6 +56,17 @@
              min-h-screen flex flex-col items-center justify-center
              p-6 antialiased text-base transition-colors duration-500 ease-out select-none">
 
+    <!-- Mensagem Padrão de Sistema (Sem Clique) -->
+    <div class="fixed top-6 right-6 z-40 flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide
+                bg-slate-100 text-slate-500 border border-slate-200
+                dark:bg-slate-950 dark:text-emerald-500/90 dark:border-emerald-500/30 pointer-events-none">
+        <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span>Servidor Conectado</span>
+    </div>
+
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
     <div id="loading-screen" class="fixed inset-0 bg-slate-900/98 backdrop-blur-lg z-50 hidden flex flex-col items-center justify-center space-y-6">
@@ -156,8 +167,6 @@ try {
     console.log("Tema padrão ativado.");
 }
 
-// CORREÇÃO: Força o Firebase a esquecer a sessão assim que fechar a aba ou recarregar
-// Evitando o login automático indesejado.
 try {
     await setPersistence(auth, browserSessionPersistence);
 } catch (error) {
@@ -184,7 +193,6 @@ window.handleAuth = async function(e) {
             await signInWithEmailAndPassword(auth, email, password);
         }
 
-        // Se a autenticação der certo, mostra o Splash Screen e joga pro dashboard
         document.getElementById("auth-container").classList.add("opacity-0", "scale-95");
         document.getElementById("loading-screen").classList.remove("hidden");
         
