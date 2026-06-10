@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Login</title>
+    
+    <link rel="icon" type="image/png" href="financial_lamp_logo.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,13 +37,13 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 transition-colors duration-300 antialiased">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 flex items-center justify-center p-4 antialiased">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
     <div id="loading-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center space-y-6 transition-all duration-500">
         <div class="flex items-center gap-3 text-4xl font-extrabold tracking-tight text-white animate-pulse">
-            <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.7)]"></i>
+            <img src="financial_lamp_logo.png" alt="LampFinance Logo" class="w-14 h-14 drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
             <span>Lamp<span class="text-emerald-500">Finance</span></span>
         </div>
         <div class="flex flex-col items-center space-y-3">
@@ -49,8 +55,8 @@
 
     <div id="auth-container" class="w-full max-w-md bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60 space-y-6 transition-all duration-300">
         <div class="text-center space-y-2">
-            <div class="flex items-center justify-center gap-3 text-3xl font-extrabold tracking-tight">
-                <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]"></i>
+            <div class="flex flex-col items-center justify-center gap-2 text-3xl font-extrabold tracking-tight">
+                <img src="financial_lamp_logo.png" alt="LampFinance Logo" class="w-16 h-16 drop-shadow-[0_0_12px_rgba(245,158,11,0.4)]">
                 <span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
             <p class="text-sm text-slate-500 dark:text-slate-400" id="auth-subtitle">Acesse sua conta para gerenciar suas finanças</p>
@@ -86,6 +92,15 @@
 
         initTheme();
 
+        // REGISTRO DE MOTOR PWA PARA DOWNLOAD DE DESKTOP
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Motor de Área de Trabalho Ativo.'))
+                    .catch(err => console.log('Erro ao carregar motor PWA.'));
+            });
+        }
+
         // Escutador de Autenticação com Splash Screen de 3 segundos
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -103,8 +118,6 @@
             e.preventDefault();
             const email = document.getElementById("auth-email").value.trim();
             const password = document.getElementById("auth-password").value;
-            
-            // Correção aqui: Verifica se a div de registro está visível na tela
             const isRegister = !document.getElementById("register-only-fields").classList.contains("hidden");
 
             try {
@@ -114,15 +127,11 @@
                         showToast("As senhas não coincidem!", "error"); 
                         return; 
                     }
-                    // Executa a criação real do usuário no Firebase Auth
                     const credential = await createUserWithEmailAndPassword(auth, email, password);
-                    
-                    // Registra o perfil do usuário na coleção para o Painel Admin ler
                     await setDoc(doc(db, "users_profiles", credential.user.uid), { 
                         uid: credential.user.uid, 
                         email: email 
                     });
-                    
                     showToast("Conta criada com sucesso! Entrando...", "success");
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
