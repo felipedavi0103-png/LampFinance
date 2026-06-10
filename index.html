@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LampFinance - Login</title>
 
     <link rel="icon" type="image/png" sizes="32x32" href="financial_lamp_logo.png">
@@ -47,7 +47,8 @@
              min-h-screen flex flex-col items-center justify-center
              p-4 sm:p-6 antialiased text-base transition-colors duration-300">
 
-    <div class="absolute top-4 right-4 flex items-center gap-2">
+    <!-- BOTÃO GLOBAL SIMULAR MOBILE -->
+    <div class="absolute top-4 right-4 flex items-center gap-2 z-50">
         <button onclick="toggleForceMobileView()" id="btn-force-mobile" class="px-3 py-1.5 flex items-center gap-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold hover:border-emerald-500 transition-all shadow-sm" title="Forçar Visualização Mobile">
             <i class="fa-solid fa-mobile-screen-button"></i>
             <span class="hidden sm:inline" id="text-force-mobile">Simular Mobile</span>
@@ -69,51 +70,52 @@
         </div>
     </div>
 
+    <!-- CONTAINER PRINCIPAL -->
     <div id="auth-container"
-         class="w-full max-w-md mx-auto bg-white dark:bg-slate-950
-                p-5 sm:p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60
+         class="w-full max-w-sm mx-auto bg-white dark:bg-slate-950
+                p-6 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/60
                 space-y-6 transition-all duration-300">
 
         <div class="text-center space-y-2">
-            <div id="auth-logo-wrapper" class="flex flex-col items-center gap-2 text-2xl sm:text-4xl font-extrabold transition-all">
-                <img id="auth-logo-img" src="financial_lamp_logo.png" class="w-14 h-14 sm:w-20 sm:h-20 transition-all">
+            <div id="auth-logo-wrapper" class="flex flex-col items-center gap-2 text-2xl font-extrabold transition-all">
+                <img id="auth-logo-img" src="financial_lamp_logo.png" class="w-14 h-14 transition-all">
                 <span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
 
-            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                 Acesse sua conta para gerenciar suas finanças
             </p>
         </div>
 
         <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
             <div>
-                <label class="block text-[10px] sm:text-xs font-bold uppercase text-slate-400 mb-1">E-mail</label>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">E-mail</label>
                 <input type="email" id="auth-email" required
-                       class="w-full p-3.5 sm:p-4 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
+                       class="w-full p-3.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
                               border border-slate-200 dark:border-slate-800
                               focus:border-emerald-500 outline-none transition">
             </div>
 
             <div>
-                <label class="block text-[10px] sm:text-xs font-bold uppercase text-slate-400 mb-1">Senha</label>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Senha</label>
                 <input type="password" id="auth-password" required
-                       class="w-full p-3.5 sm:p-4 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
+                       class="w-full p-3.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
                               border border-slate-200 dark:border-slate-800
                               focus:border-emerald-500 outline-none transition">
             </div>
 
             <div id="register-only-fields" class="hidden space-y-4">
                 <div>
-                    <label class="block text-[10px] sm:text-xs font-bold uppercase text-slate-400 mb-1">Confirmar Senha</label>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Confirmar Senha</label>
                     <input type="password" id="auth-confirm-password"
-                           class="w-full p-3.5 sm:p-4 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
+                           class="w-full p-3.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-900
                                   border border-slate-200 dark:border-slate-800
                                   focus:border-emerald-500 outline-none transition">
                 </div>
             </div>
 
             <button type="submit" id="auth-submit-btn"
-                    class="w-full py-3.5 sm:py-4 text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600
+                    class="w-full py-3.5 text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600
                            text-slate-950 font-bold transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98]">
                 Entrar
             </button>
@@ -121,7 +123,7 @@
 
         <div class="text-center pt-2">
             <button onclick="toggleAuthMode()" id="auth-toggle-btn"
-                    class="text-xs sm:text-sm text-emerald-500 hover:underline font-medium">
+                    class="text-xs text-emerald-500 hover:underline font-medium">
                 Não tem uma conta? Cadastre-se
             </button>
         </div>
@@ -132,29 +134,23 @@ import { auth, db, initTheme } from "./firebase-config.js";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-initTheme();
+try {
+    initTheme();
+} catch(e) {
+    console.log("Tema inicializado por padrão");
+}
 
-// FUNÇÃO GLOBAL DE SINCRONIZAÇÃO DA VISUALIZAÇÃO MOBILE
 window.applySavedLayoutStates = function() {
     const isForceMobile = localStorage.getItem("forceMobileView") === "true";
     const btnMobile = document.getElementById("btn-force-mobile");
     const textMobile = document.getElementById("text-force-mobile");
-    const logoWrapper = document.getElementById("auth-logo-wrapper");
-    const logoImg = document.getElementById("auth-logo-img");
 
     if (isForceMobile) {
         if (btnMobile) btnMobile.classList.add("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
         if (textMobile) textMobile.innerText = "Modo Mobile Ativo";
-        
-        // Reduz elementos simulando tela pequena mesmo se estiver no Monitor/PC
-        if (logoWrapper) { logoWrapper.classList.remove("sm:text-4xl"); logoWrapper.classList.add("text-2xl"); }
-        if (logoImg) { logoImg.classList.remove("sm:w-20", "sm:h-20"); logoImg.classList.add("w-14", "h-14"); }
     } else {
         if (btnMobile) btnMobile.classList.remove("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
         if (textMobile) textMobile.innerText = "Simular Mobile";
-        
-        if (logoWrapper) { logoWrapper.classList.add("sm:text-4xl"); }
-        if (logoImg) { logoImg.classList.add("sm:w-20", "sm:h-20"); }
     }
 }
 
@@ -164,12 +160,11 @@ window.toggleForceMobileView = function() {
     window.applySavedLayoutStates();
 };
 
-// Executa na carga da página
 window.applySavedLayoutStates();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
+        navigator.serviceWorker.register('./sw.js').catch(e => console.log("SW offline"));
     });
 }
 
@@ -225,5 +220,4 @@ window.toggleAuthMode = function() {
 };
 </script>
 </body>
-<script src="ui-controller.js"></script>
 </html>
