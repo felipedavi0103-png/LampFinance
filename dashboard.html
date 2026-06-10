@@ -34,9 +34,11 @@
         ::-webkit-scrollbar-track { background: transparent; }
         .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        /* Transição suave para a sidebar encolhendo */
+        .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out; }
     </style>
 </head>
-<!-- CORREÇÃO: flex mudou para flex-col no mobile e md:flex-row no desktop -->
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col md:flex-row transition-colors duration-300 antialiased overflow-x-hidden">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
@@ -46,7 +48,6 @@
         <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
     </div>
 
-    <!-- BOTÃO TOGGLE DA SIDEBAR NO MOBILE -->
     <div class="md:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center gap-2 text-lg font-bold">
             <i class="fa-solid fa-lightbulb text-amber-500"></i>
@@ -57,66 +58,73 @@
         </button>
     </div>
 
-    <!-- CORREÇÃO SIDEBAR: Classes de posicionamento fixo/overlay retrátil para telas pequenas -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:sticky md:flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex-col justify-between h-screen z-50 transition-transform duration-300 ease-in-out">
-        <div class="p-5 space-y-6 overflow-y-auto flex-1">
-            <div class="hidden md:flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-4">
+    <aside id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:sticky md:flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex-col justify-between h-screen z-50 group">
+        
+        <button onclick="toggleSidebarCollapse()" class="hidden md:flex absolute -right-3 top-20 bg-emerald-500 text-slate-950 w-6 h-6 rounded-full items-center justify-center text-xs shadow-md border border-emerald-600 hover:bg-emerald-400 transition-all z-50">
+            <i id="collapse-icon" class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="p-5 space-y-6 overflow-y-auto flex-1 overflow-x-hidden">
+            <div class="hidden md:flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-4 whitespace-nowrap">
                 <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]"></i>
-                <span>Lamp<span class="text-emerald-500">Finance</span></span>
+                <span class="sidebar-text">Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
 
-            <div class="relative">
-                <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 px-1">Ambiente Ativo</label>
+            <div class="relative id-workspace-container">
+                <label class="sidebar-text block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 px-1">Ambiente Ativo</label>
                 <select id="workspace-select" onchange="changeWorkspace()" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-semibold focus:outline-none text-slate-700 dark:text-slate-200 cursor-pointer transition">
-                    <option value="empresa">🏢 Perfil Empresa</option>
-                    <option value="pessoal">👤 Perfil Pessoal</option>
+                    <option value="empresa">🏢 <span class="sidebar-text">Perfil Empresa</span></option>
+                    <option value="pessoal">👤 <span class="sidebar-text">Perfil Pessoal</span></option>
                 </select>
             </div>
 
             <nav class="space-y-1">
-                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all">
-                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Dashboard</span>
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all" title="Dashboard">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-base"></i> <span class="sidebar-text">Dashboard</span>
                 </a>
-                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
-                    <i class="fa-solid fa-receipt w-5 text-center"></i> <span>Lançamentos</span>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all" title="Lançamentos">
+                    <i class="fa-solid fa-receipt w-5 text-center text-base"></i> <span class="sidebar-text">Lançamentos</span>
                 </a>
-                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
-                    <i class="fa-solid fa-sliders w-5 text-center"></i> <span>Configurações</span>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all" title="Configurações">
+                    <i class="fa-solid fa-sliders w-5 text-center text-base"></i> <span class="sidebar-text">Configurações</span>
                 </a>
-                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
-                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> <span>DRE Dinâmico</span>
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all" title="DRE Dinâmico">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-base"></i> <span class="sidebar-text">DRE Dinâmico</span>
                 </a>
-                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all">
-                    <i class="fa-solid fa-shield-halved w-5 text-center"></i> <span>Painel Admin</span>
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all" title="Painel Admin">
+                    <i class="fa-solid fa-shield-halved w-5 text-center text-base"></i> <span class="sidebar-text">Painel Admin</span>
                 </a>
             </nav>
         </div>
 
-        <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400 dark:text-slate-500">
-            <span id="sync-status">Sincronizado</span>
-            <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2 text-xs text-slate-400 dark:text-slate-500">
+            <div class="flex justify-between items-center w-full min-w-0">
+                <span id="sync-status" class="sidebar-text truncate">Sincronizado</span>
+                <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1" title="Sair"><i class="fa-solid fa-right-from-bracket text-base md:text-xs"></i> <span class="sidebar-text">Sair</span></button>
+            </div>
         </div>
     </aside>
 
-    <!-- BACKDROP DA SIDEBAR MOBILE -->
     <div id="sidebar-backdrop" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 md:hidden"></div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-        <!-- CORREÇÃO HEADER: Ajustado padding lateral no mobile de px-8 para px-4 -->
         <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 flex justify-between items-center">
             <h2 class="text-sm sm:text-lg font-bold tracking-tight">Dashboard Geral de BI</h2>
-            <div class="flex items-center gap-3 sm:gap-4">
+            <div class="flex items-center gap-2 sm:gap-4">
+                
+                <button onclick="toggleForceMobileView()" id="btn-force-mobile" class="px-3 py-1.5 flex items-center gap-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold hover:border-emerald-500 transition-all" title="Forçar Visualização Mobile">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span class="hidden sm:inline" id="text-force-mobile">Simular Mobile</span>
+                </button>
+
                 <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all">
                     <i id="theme-icon" class="fa-solid fa-moon"></i>
                 </button>
-                <span id="user-display-email" class="text-[10px] sm:text-xs font-medium text-slate-400 truncate max-w-[120px] sm:max-w-none">Carregando usuário...</span>
+                <span id="user-display-email" class="text-[10px] sm:text-xs font-medium text-slate-400 truncate max-w-[100px] sm:max-w-none">Carregando usuário...</span>
             </div>
         </header>
 
-        <!-- CORREÇÃO MAIN CONTAINER: Ajustado padding p-4 no mobile para não achatar e manter respiro -->
         <main class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8">
-            <!-- CARDS KPI: Passaram a empilhar em 1 coluna no mobile automático -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <div class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm">
                     <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Receitas Totais</div>
@@ -136,8 +144,7 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS: Mudança na altura interna e overflow preventivo para resoluções pequenas -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="charts-wrapper">
                 <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-72 sm:h-80 flex flex-col justify-between">
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Fluxo Mensal de Caixa</h4>
@@ -196,12 +203,71 @@
         let charts = { global: null, bancos: null, categorias: null };
         let chartTypes = { global: 'line', bancos: 'bar', categorias: 'pie' };
 
-        // ADICIONADO: Função para controlar abertura e fechamento da sidebar no mobile
+        // 1. ENGINE DE AUTO-APLICAÇÃO DOS ESTADOS SALVOS (MINIMIZADO E MODO MOBILE)
+        function applySavedLayoutStates() {
+            const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+            const isForceMobile = localStorage.getItem("forceMobileView") === "true";
+            
+            const sidebar = document.getElementById("sidebar");
+            const collapseIcon = document.getElementById("collapse-icon");
+            const texts = document.querySelectorAll(".sidebar-text");
+            const chartsWrapper = document.getElementById("charts-wrapper");
+
+            // Aplica estado minimizado (apenas faz efeito real em telas desktop)
+            if (isCollapsed) {
+                sidebar.classList.remove("md:w-64");
+                sidebar.classList.add("md:w-20");
+                if(collapseIcon) collapseIcon.className = "fa-solid fa-chevron-right";
+                texts.forEach(t => t.classList.add("md:hidden"));
+            } else {
+                sidebar.classList.remove("md:w-20");
+                sidebar.classList.add("md:w-64");
+                if(collapseIcon) collapseIcon.className = "fa-solid fa-chevron-left";
+                texts.forEach(t => t.classList.remove("md:hidden"));
+            }
+
+            // Aplica Estado de Simulação Mobile Forçado globalmente
+            const btnMobile = document.getElementById("btn-force-mobile");
+            const textMobile = document.getElementById("text-force-mobile");
+            
+            if (isForceMobile) {
+                if (btnMobile) btnMobile.classList.add("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
+                if (textMobile) textMobile.innerText = "Modo Mobile Ativo";
+                if (chartsWrapper) {
+                    chartsWrapper.classList.remove("lg:grid-cols-2");
+                    document.getElementById("card-chart-categorias").classList.remove("lg:col-span-2");
+                }
+            } else {
+                if (btnMobile) btnMobile.classList.remove("bg-emerald-500/10", "border-emerald-500", "text-emerald-500");
+                if (textMobile) textMobile.innerText = "Simular Mobile";
+                if (chartsWrapper) {
+                    chartsWrapper.classList.add("lg:grid-cols-2");
+                    document.getElementById("card-chart-categorias").classList.add("lg:col-span-2");
+                }
+            }
+        }
+
+        // 2. TRIGGER DO BOTÃO MINIMIZAR SIDEBAR
+        window.toggleSidebarCollapse = function() {
+            const current = localStorage.getItem("sidebarCollapsed") === "true";
+            localStorage.setItem("sidebarCollapsed", !current);
+            applySavedLayoutStates();
+            setTimeout(() => renderCharts(), 310); // Aguarda a transição CSS acabar para recalcular o tamanho dos gráficos
+        };
+
+        // 3. TRIGGER DO BOTÃO GLOBAL DE SIMULAR MOBILE
+        window.toggleForceMobileView = function() {
+            const current = localStorage.getItem("forceMobileView") === "true";
+            localStorage.setItem("forceMobileView", !current);
+            applySavedLayoutStates();
+            renderCharts();
+        };
+
+        // CONTROLE DA SIDEBAR FLUTUANTE EM DISPOSITIVOS MÓVEIS REAIS
         window.toggleMobileMenu = function() {
             const sidebar = document.getElementById("sidebar");
             const backdrop = document.getElementById("sidebar-backdrop");
             const icon = document.getElementById("mobile-menu-icon");
-            
             const isOpen = sidebar.classList.contains("translate-x-0");
             
             if (isOpen) {
@@ -220,6 +286,8 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
             
+            applySavedLayoutStates(); // Garante a consistência do layout assim que a página renderizar
+
             const impUid = sessionStorage.getItem("impersonatedUid");
             if (impUid && user.email === ADMIN_EMAIL) {
                 document.getElementById("support-banner").classList.remove("hidden");
@@ -305,8 +373,9 @@
             if (charts.categorias) charts.categorias.destroy();
             const cDesp = state.categorias.filter(c => c.tipo === "despesa");
             
-            // Ajuste responsivo de legenda para o gráfico de pizza/rosca
-            const legendPosition = window.innerWidth < 640 ? 'bottom' : 'right';
+            // Layout de legenda fluído caso o modo mobile forçado esteja ativo
+            const isForceMobile = localStorage.getItem("forceMobileView") === "true";
+            const legendPosition = (window.innerWidth < 640 || isForceMobile) ? 'bottom' : 'right';
 
             charts.categorias = new Chart(document.getElementById("canvas-chart-categorias"), {
                 type: chartTypes.categorias,
@@ -351,11 +420,9 @@
             await signOut(auth);
         };
 
-        // Redesenhar gráficos ao mudar tamanho de tela (muda posições de legenda mobile)
         window.addEventListener('resize', () => {
             renderCharts();
         });
     </script>
 </body>
-    <script src="ui-controller.js"></script>
 </html>
