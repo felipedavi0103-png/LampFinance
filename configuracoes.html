@@ -3,15 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LampFinance - Login</title>
-
-    <link rel="icon" type="image/png" sizes="32x32" href="financial_lamp_logo.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="financial_lamp_logo.png">
-    <link rel="apple-touch-icon" href="financial_lamp_logo.png">
-
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#10b981">
-
+    <title>LampFinance - Configurações</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,185 +23,314 @@
             }
         }
     </script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
-            -webkit-text-fill-color: #f8fafc !important;
-            transition: background-color 5000s ease-in-out 0s;
-        }
-        @keyframes dash {
-            0% { left: -50%; width: 50%; }
-            50% { left: 25%; width: 40%; }
-            100% { left: 100%; width: 50%; }
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-6 antialiased text-base transition-colors duration-500 ease-out select-none">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased select-none">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-    <div id="loading-screen" class="fixed inset-0 bg-slate-900/98 backdrop-blur-lg z-50 hidden flex flex-col items-center justify-center space-y-6">
-        <div class="flex items-center gap-3 text-4xl font-extrabold text-white tracking-tight">
-            <img src="financial_lamp_logo.png" class="w-16 h-16 drop-shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-            <span>Lamp<span class="text-emerald-500">Finance</span></span>
-        </div>
-
-        <div class="flex flex-col items-center space-y-4">
-            <div class="w-48 h-1 bg-slate-800 rounded-full overflow-hidden relative">
-                <div class="absolute inset-y-0 bg-emerald-500 w-1/2 rounded-full" style="animation: dash 1.5s infinite ease-in-out;"></div>
-            </div>
-            <p class="text-xs font-medium tracking-wider text-slate-400 uppercase">Acessando Diretrizes...</p>
-        </div>
+    <div id="support-banner" class="hidden bg-amber-500 text-slate-950 font-semibold px-4 py-2.5 text-center text-sm shadow-md fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 transition-all duration-300">
+        <span><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> <strong>MODO SUPORTE ATIVO:</strong> Você está editando a conta de <span id="support-user-email" class="underline font-bold"></span>.</span>
+        <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
     </div>
 
-    <div id="auth-container" class="w-full max-w-[420px] mx-auto bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800/80 space-y-6 transition-all duration-300">
-
-        <div class="text-center space-y-1.5">
-            <div id="auth-logo-wrapper" class="flex flex-col items-center gap-3 text-3xl font-extrabold tracking-tight">
-                <img id="auth-logo-img" src="financial_lamp_logo.png" class="w-16 h-16 drop-shadow-[0_4px_10px_rgba(34,197,94,0.15)]">
-                <span>Lamp<span class="text-emerald-500">Finance</span></span>
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30">
+        <div class="p-5 space-y-6 overflow-y-auto flex-1">
+            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
-            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">Gerenciador Financeiro Corporativo</p>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
+            </nav>
         </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+            <span id="sync-status">Sincronizado</span>
+            <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+        </div>
+    </aside>
 
-        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
-            <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">E-mail corporativo</label>
-                <input type="email" id="auth-email" required placeholder="nome@empresa.com" autocomplete="username"
-                       class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all duration-200">
-            </div>
-
-            <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">Senha de acesso</label>
-                <input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password"
-                       class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all duration-200">
-            </div>
-
-            <div id="register-only-fields" class="hidden opacity-0 transform translate-y-[-10px] transition-all duration-300 ease-out space-y-4">
-                <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 px-0.5">Confirmação de Senha</label>
-                    <input type="password" id="auth-confirm-password" placeholder="••••••••" autocomplete="new-password"
-                           class="w-full px-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all duration-200">
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center z-20">
+            <h2 class="text-lg font-bold">Plano Estrutural de Contas</h2>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold"><i class="fa-solid fa-user"></i></div>
+                    <span id="user-display-email" class="font-medium text-slate-500 dark:text-slate-400">Verificando...</span>
                 </div>
             </div>
+        </header>
 
-            <div class="pt-2">
-                <button type="submit" id="auth-submit-btn" class="w-full py-3.5 text-sm rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-slate-950 font-bold tracking-wide transition-all duration-150 shadow-md shadow-emerald-500/10 active:scale-[0.99] flex items-center justify-center gap-2">
-                    <span>Entrar no Sistema</span>
-                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                </button>
+        <main class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-university text-blue-500"></i> Contas Bancárias</h4>
+                <form onsubmit="addBanco(event)" class="flex gap-2 text-xs">
+                    <input type="text" id="input-bc-codigo" required placeholder="Cód" class="w-20 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500">
+                    <input type="text" id="input-bc-nome" required placeholder="Nome do Banco" class="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 rounded-xl font-bold text-white transition-colors">Criar</button>
+                </form>
+                <ul id="ul-bancos" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs max-h-64 overflow-y-auto space-y-1 pt-2"></ul>
             </div>
-        </form>
 
-        <div class="text-center pt-2 border-t border-slate-100 dark:border-slate-900">
-            <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-emerald-500 hover:text-emerald-400 font-semibold transition-colors duration-150">
-                Não possui credenciais? Cadastre sua conta
-            </button>
-        </div>
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-tags text-purple-500"></i> Categorias Estruturais</h4>
+                <form onsubmit="addCategoria(event)" class="grid grid-cols-4 gap-2 text-xs">
+                    <input type="text" id="input-cat-codigo" required placeholder="Cód" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-purple-500">
+                    <select id="input-cat-tipo" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-purple-500">
+                        <option value="receita">Receita</option>
+                        <option value="despesa">Despesa</option>
+                    </select>
+                    <input type="text" id="input-cat-nome" required placeholder="Nome" class="col-span-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-purple-500">
+                    <button type="submit" class="col-span-4 bg-purple-600 hover:bg-purple-700 py-2.5 rounded-xl font-bold text-white transition-colors">Criar Nova Categoria</button>
+                </form>
+                <ul id="ul-categorias" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs max-h-64 overflow-y-auto space-y-1 pt-2"></ul>
+            </div>
+
+            <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm space-y-4 lg:col-span-2">
+                <h4 class="text-sm font-bold text-amber-500"><i class="fa-solid fa-key"></i> Alterar Minha Senha de Acesso</h4>
+                <p class="text-xs text-slate-400">Insira sua nova senha pessoal abaixo para substituir senhas temporárias de suporte.</p>
+                <form onsubmit="changeUserPassword(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs items-end">
+                    <div><label class="block mb-1 text-slate-400 font-semibold">Nova Senha</label><input type="password" id="input-new-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500"></div>
+                    <div><label class="block mb-1 text-slate-400 font-semibold">Confirmar Nova Senha</label><input type="password" id="input-confirm-new-password" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500"></div>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl shadow-md transition-colors">Atualizar Senha</button>
+                </form>
+            </div>
+        </main>
     </div>
 
     <script type="module">
-        import { auth, db, initTheme } from "./firebase-config.js";
-        import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
+        import { onAuthStateChanged, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-        try {
-            initTheme();
-        } catch(e) {
-            console.log("Tema padrão ativado.");
-        }
+        initTheme();
+        
+        let state = { bancos: [], categorias: [] };
+        let targetUid = ""; let workspace = "";
 
-        // CORREÇÃO 1: Alinha a persistência para modo LOCAL compartilhado por todas as abas de forma coesa
-        try {
-            await setPersistence(auth, browserLocalPersistence);
-        } catch (error) {
-            console.error("Erro ao aplicar persistência estável:", error);
-        }
-
-        // CORREÇÃO 2: Restaura o escutador de monitoramento ativo na raiz para redirecionar sessões já abertas
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById("auth-container").classList.add("opacity-0", "scale-95");
-                document.getElementById("loading-screen").classList.remove("hidden");
+        // MONITOR E REDIRECIONADOR COESO DE SESSÃO
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
                 setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 1500);
+                    if (!auth.currentUser) window.location.href = "index.html";
+                }, 500);
+                return;
             }
+            
+            document.getElementById("user-display-email").innerText = user.email;
+
+            // Validação e persistência ativa do Modo Suporte Admin corporativo
+            const impUid = sessionStorage.getItem("impersonatedUid");
+            const impEmail = sessionStorage.getItem("impersonatedEmail");
+            if (impUid && user.email === ADMIN_EMAIL) {
+                document.getElementById("support-banner").classList.remove("hidden");
+                document.getElementById("support-user-email").innerText = impEmail;
+            }
+
+            if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel-btn").classList.remove("hidden");
+            
+            targetUid = impUid || user.uid;
+            workspace = localStorage.getItem("workspace") || "empresa";
+            if (workspace === "pessoal") document.getElementById("menu-dre-btn").classList.add("hidden");
+            
+            await loadData();
         });
 
-        window.handleAuth = async function(e) {
-            e.preventDefault();
-            const email = document.getElementById("auth-email").value.trim();
-            const password = document.getElementById("auth-password").value;
-            const isRegister = !document.getElementById("register-only-fields").classList.contains("hidden");
-
+        // Carrega metadados (Bancos e Categorias) salvos no documento mestre do Workspace
+        async function loadData() {
             try {
-                if (isRegister) {
-                    const confirm = document.getElementById("auth-confirm-password").value;
-                    if (password !== confirm) {
-                        showToast("As senhas não coincidem!", "error");
-                        return;
-                    }
-
-                    const credential = await createUserWithEmailAndPassword(auth, email, password);
-                    await setDoc(doc(db, "users_profiles", credential.user.uid), {
-                        uid: credential.user.uid,
-                        email: email
-                    });
-                    showToast("Conta corporativa criada com sucesso!", "success");
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    // O onAuthStateChanged tratará o sucesso direcionando para o dashboard
+                const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
+                if (docSnap.exists()) { 
+                    const data = docSnap.data();
+                    state.bancos = data.bancos || [];
+                    state.categorias = data.categorias || [];
+                    renderLists(); 
                 }
             } catch (err) {
-                showToast("Falha na validação: Credenciais incorretas.", "error");
+                console.error("Erro na leitura de metadados:", err);
+            }
+        }
+
+        // CONVERSOR GRÁFICO DINÂMICO DE ESTRUTURAS COM SUPORTE A EDIÇÃO E EXCLUSÃO
+        function renderLists() {
+            // Renderiza Contas Bancárias
+            document.getElementById("ul-bancos").innerHTML = state.bancos.map(b => `
+                <li class="py-2.5 px-3 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl transition-all duration-200">
+                    <span class="font-medium">Cód: <strong class="font-mono text-blue-500 font-bold">${b.codigo}</strong> - <span class="text-slate-700 dark:text-slate-300 font-semibold">${b.nome}</span></span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="editBanco('${b.codigo}')" type="button" class="text-slate-400 hover:text-blue-500 p-1.5 transition-colors" title="Editar Nome"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteBanco('${b.codigo}')" type="button" class="text-slate-400 hover:text-rose-500 p-1.5 transition-colors" title="Excluir"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </li>
+            `).join('');
+
+            // Renderiza Categorias Gerenciais
+            document.getElementById("ul-categorias").innerHTML = state.categorias.map(c => `
+                <li class="py-2.5 px-3 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl transition-all duration-200">
+                    <span class="font-medium">Cód: <strong class="font-mono text-purple-500 font-bold">${c.codigo}</strong> - <span class="text-slate-700 dark:text-slate-300 font-semibold">${c.nome}</span></span>
+                    <div class="flex items-center gap-3">
+                        <span class="uppercase font-extrabold text-[9px] px-1.5 py-0.5 rounded tracking-wider ${c.tipo==='receita'?'bg-emerald-500/10 text-emerald-500':'bg-rose-500/10 text-rose-500'}">${c.tipo}</span>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editCategoria('${c.codigo}')" type="button" class="text-slate-400 hover:text-purple-500 p-1.5 transition-colors" title="Editar Nome"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteCategoria('${c.codigo}')" type="button" class="text-slate-400 hover:text-rose-500 p-1.5 transition-colors" title="Excluir"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // OPERAÇÕES DO MOTOR CRUD INTERNO DE METADADOS
+        window.deleteBanco = async function(codigo) {
+            if (confirm("Deseja realmente remover esta conta bancária do seu Plano de Contas?")) {
+                state.bancos = state.bancos.filter(b => b.codigo !== codigo);
+                await save();
+                renderLists();
+                showToast("Conta bancária removida com sucesso!", "success");
             }
         };
 
-        window.toggleAuthMode = function() {
-            const regFields = document.getElementById("register-only-fields");
-            const submitBtn = document.getElementById("auth-submit-btn");
-            const toggleBtn = document.getElementById("auth-toggle-btn");
+        window.editBanco = async function(codigo) {
+            const banco = state.bancos.find(b => b.codigo === codigo);
+            if (!banco) return;
             
-            if (regFields.classList.contains("hidden")) {
-                regFields.classList.remove("hidden");
-                setTimeout(() => {
-                    regFields.classList.remove("opacity-0", "translate-y-[-10px]");
-                }, 10);
-                submitBtn.innerHTML = `<span>Criar Nova Conta</span> <i class="fa-solid fa-user-plus text-xs"></i>`;
-                toggleBtn.innerText = "Já possui uma conta? Realizar Login";
-                document.getElementById("auth-confirm-password").required = true;
-            } else {
-                regFields.classList.add("opacity-0", "translate-y-[-10px]");
-                setTimeout(() => {
-                    regFields.classList.add("hidden");
-                }, 300);
-                submitBtn.innerHTML = `<span>Entrar no Sistema</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
-                toggleBtn.innerText = "Não possui credenciais? Cadastre sua conta";
-                document.getElementById("auth-confirm-password").required = false;
+            const novoNome = prompt("Insira a nova identificação para a Conta Bancária:", banco.nome);
+            if (novoNome && novoNome.trim() !== "") {
+                banco.nome = novoNome.trim();
+                await save();
+                renderLists();
+                showToast("Nome do banco atualizado com sucesso!", "success");
             }
+        };
+
+        window.deleteCategoria = async function(codigo) {
+            if (confirm("Deseja realmente excluir esta categoria gerencial?")) {
+                state.categorias = state.categorias.filter(c => c.codigo !== codigo);
+                await save();
+                renderLists();
+                showToast("Categoria gerencial removida com sucesso!", "success");
+            }
+        };
+
+        window.editCategoria = async function(codigo) {
+            const categoria = state.categorias.find(c => c.codigo === codigo);
+            if (!categoria) return;
+
+            const novoNome = prompt("Insira a nova identificação para a Categoria:", categoria.nome);
+            if (novoNome && novoNome.trim() !== "") {
+                categoria.nome = novoNome.trim();
+                await save();
+                renderLists();
+                showToast("Categoria gerencial atualizada com sucesso!", "success");
+            }
+        };
+
+        window.addBanco = async function(e) {
+            e.preventDefault();
+            const codigo = document.getElementById("input-bc-codigo").value.trim();
+            const nome = document.getElementById("input-bc-nome").value.trim();
+
+            if (state.bancos.some(b => b.codigo === codigo)) {
+                showToast("Este código de conta já existe!", "error");
+                return;
+            }
+
+            state.bancos.push({ codigo, nome });
+            document.getElementById("input-bc-codigo").value = "";
+            document.getElementById("input-bc-nome").value = "";
+            await save(); 
+            renderLists();
+            showToast("Nova conta bancária registrada!", "success");
+        };
+
+        window.addCategoria = async function(e) {
+            e.preventDefault();
+            const codigo = document.getElementById("input-cat-codigo").value.trim();
+            const nome = document.getElementById("input-cat-nome").value.trim();
+            const tipo = document.getElementById("input-cat-tipo").value;
+
+            if (state.categorias.some(c => c.codigo === codigo)) {
+                showToast("Este código de categoria já existe!", "error");
+                return;
+            }
+
+            state.categorias.push({ codigo, tipo, nome });
+            document.getElementById("input-cat-codigo").value = "";
+            document.getElementById("input-cat-nome").value = "";
+            await save(); 
+            renderLists();
+            showToast("Nova categoria estruturada com sucesso!", "success");
+        };
+
+        window.changeUserPassword = async function(e) {
+            e.preventDefault();
+            const pass = document.getElementById("input-new-password").value;
+            if(pass !== document.getElementById("input-confirm-new-password").value) { 
+                showToast("As senhas não coincidem!", "error"); 
+                return; 
+            }
+            try {
+                await updatePassword(auth.currentUser, pass);
+                showToast("Sua senha foi alterada com sucesso!", "success");
+                document.getElementById("input-new-password").value = "";
+                document.getElementById("input-confirm-new-password").value = "";
+            } catch(e) { 
+                showToast("Sessão de segurança expirada. Realize login novamente.", "error"); 
+            }
+        };
+
+        // Salva as alterações mesclando os dados sem apagar coleções vizinhas
+        async function save() {
+            document.getElementById("sync-status").innerText = "Salvando...";
+            try {
+                await setDoc(doc(db, "users", targetUid, "workspaces", workspace), {
+                    bancos: state.bancos,
+                    categorias: state.categorias
+                }, { merge: true });
+                document.getElementById("sync-status").innerText = "Sincronizado";
+            } catch(err) {
+                showToast("Falha no salvamento: " + err.message, "error");
+            }
+        }
+
+        window.toggleTheme = function() {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        };
+
+        window.exitImpersonation = function() {
+            sessionStorage.removeItem("impersonatedUid");
+            sessionStorage.removeItem("impersonatedEmail");
+            window.location.href = "admin.html";
+        };
+
+        window.handleLogout = async function() {
+            await signOut(auth);
         };
 
         function showToast(message, type = "success") {
             const container = document.getElementById("toast-container");
             const toast = document.createElement("div");
             const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
-            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300`;
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300 pointer-events-auto`;
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
+            setTimeout(() => toast.remove(), 3500);
         }
     </script>
 </body>
