@@ -45,8 +45,7 @@
         <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
     </div>
 
-    <aside id="sidebar" class="sticky top-0 flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/80 flex-col justify-between h-screen z-40">
-        
+    <aside id="sidebar" class="sticky top-0 flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/80 flex flex-col justify-between h-screen z-40">
         <div class="p-5 space-y-6 overflow-y-auto flex-1 overflow-x-hidden">
             <div class="flex items-center gap-2.5 text-xl font-bold tracking-tight px-1 pt-2 whitespace-nowrap">
                 <i class="fa-solid fa-lightbulb text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]"></i>
@@ -103,8 +102,8 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8 space-y-6">
-            <div class="grid grid-cols-4 gap-5">
+        <main class="p-8 space-y-6 flex-1 overflow-y-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
                     <div class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Receitas Totais</div>
                     <div id="kpi-receitas" class="text-2xl font-extrabold text-emerald-500 mt-1">R$ 0,00</div>
@@ -123,7 +122,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-6" id="charts-wrapper">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="charts-wrapper">
                 <div id="card-chart-global" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between transition-all hover:shadow-md">
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Fluxo Mensal de Caixa</h4>
@@ -153,7 +152,7 @@
                     <div class="flex-1 relative min-h-0 w-full"><canvas id="canvas-chart-bancos"></canvas></div>
                 </div>
 
-                <div id="card-chart-categorias" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between col-span-2 transition-all hover:shadow-md">
+                <div id="card-chart-categorias" class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm h-80 flex flex-col justify-between lg:col-span-2 transition-all hover:shadow-md">
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Distribuição Gerencial de Despesas</h4>
                         <div class="relative inline-block text-left">
@@ -174,21 +173,28 @@
     <script type="module">
         import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         initTheme();
 
         let state = { transacoes: [], bancos: [], categorias: [] };
         let charts = { global: null, bancos: null, categorias: null };
-        let chartTypes = { global: 'line', bancos: 'bar', categories: 'pie' };
+        let chartTypes = { global: 'line', bancos: 'bar', categorias: 'pie' };
 
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = "index.html"; return; }
+            if (!user) {
+                setTimeout(() => {
+                    if (!auth.currentUser) window.location.href = "index.html";
+                }, 500);
+                return;
+            }
             
+            // Tratamento visual do modo suporte persistido via Session por aba
             const impUid = sessionStorage.getItem("impersonatedUid");
+            const impEmail = sessionStorage.getItem("impersonatedEmail");
             if (impUid && user.email === ADMIN_EMAIL) {
                 document.getElementById("support-banner").classList.remove("hidden");
-                document.getElementById("support-user-email").innerText = sessionStorage.getItem("impersonatedEmail");
+                document.getElementById("support-user-email").innerText = impEmail;
             }
 
             if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel-btn").classList.remove("hidden");
@@ -201,15 +207,33 @@
             await loadData(impUid || user.uid, workspace);
         });
 
+        // REESTRUTURAÇÃO AVANÇADA: Coleta metadados estruturais e faz o mapeamento total da subcoleção de lançamentos
         async function loadData(uid, workspace) {
+            document.getElementById("sync-status").innerText = "Sincronizando...";
             try {
+                // 1. Coleta bancos e categorias configurados
                 const docSnap = await getDoc(doc(db, "users", uid, "workspaces", workspace));
                 if (docSnap.exists()) {
-                    state = docSnap.data();
-                    calculateKPIs();
-                    renderCharts();
+                    const metaData = docSnap.data();
+                    state.bancos = metaData.bancos || [];
+                    state.categorias = metaData.categorias || [];
                 }
-            } catch(e) { console.error(e); }
+
+                // 2. SINCRONIZAÇÃO COMPLETA: Busca as transações na subcoleção para ignorar o limite de 1MB por arquivo
+                const txSnapshot = await getDocs(collection(db, "users", uid, "workspaces", workspace, "transacoes"));
+                state.transacoes = [];
+                txSnapshot.forEach(doc => {
+                    state.transacoes.push(doc.data());
+                });
+
+                document.getElementById("sync-status").innerText = "Sincronizado";
+                
+                calculateKPIs();
+                renderCharts();
+            } catch(e) { 
+                console.error("Falha ao carregar matriz de BI:", e); 
+                document.getElementById("sync-status").innerText = "Erro na sincronização";
+            }
         }
 
         function calculateKPIs() {
@@ -220,23 +244,28 @@
             document.getElementById("kpi-receitas").innerText = `R$ ${rec.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById("kpi-despesas").innerText = `R$ ${desp.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById("kpi-resultado").innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById("kpi-resultado").className = `text-2xl font-extrabold ${saldo >= 0 ? 'text-emerald-500':'text-rose-500'}`;
+            document.getElementById("kpi-resultado").className = `text-2xl font-extrabold mt-1 ${saldo >= 0 ? 'text-emerald-500':'text-rose-500'}`;
             document.getElementById("kpi-margem").innerText = rec > 0 ? ((saldo / rec) * 100).toFixed(1) + "%" : "0.0%";
         }
 
+        // MOTOR DE RENDERIZAÇÃO BI ESCALÁVEL (CHART.JS ENGINE)
         window.renderCharts = function() {
             const isDark = document.documentElement.classList.contains("dark");
             const textColor = isDark ? "#94a3b8" : "#475569";
             const gridColor = isDark ? "#1e293b" : "#e2e8f0";
 
-            // Chart 1: Global Flow
+            // Chart 1: Fluxo Mensal de Caixa
             if (charts.global) charts.global.destroy();
             const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
             let recMes = Array(12).fill(0), despMes = Array(12).fill(0);
+            
             state.transacoes.forEach(t => {
-                const m = new Date(t.data + 'T00:00:00').getMonth();
-                if (t.tipo === "receita") recMes[m] += t.valor; else despMes[m] += t.valor;
+                if (t.data) {
+                    const m = new Date(t.data + 'T00:00:00').getMonth();
+                    if (t.tipo === "receita") recMes[m] += t.valor; else despMes[m] += t.valor;
+                }
             });
+
             charts.global = new Chart(document.getElementById("canvas-chart-global"), {
                 type: chartTypes.global,
                 data: {
@@ -249,11 +278,12 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: textColor } } }, scales: chartTypes.global==='line'||chartTypes.global==='bar'?{ x:{grid:{color:gridColor},ticks:{color:textColor}}, y:{grid:{color:gridColor},ticks:{color:textColor}} }:{} }
             });
 
-            // Chart 2: Bancos Cross Dataset
+            // Chart 2: Fluxo Segmentado por Instituição Bancária
             if (charts.bancos) charts.bancos.destroy();
             const bLabels = state.bancos.map(b => b.nome);
             const bRec = state.bancos.map(b => state.transacoes.filter(t => t.banco === b.codigo && t.tipo === "receita").reduce((acc,c)=>acc+c.valor,0));
             const bDesp = state.bancos.map(b => state.transacoes.filter(t => t.banco === b.codigo && t.tipo === "despesa").reduce((acc,c)=>acc+c.valor,0));
+            
             charts.bancos = new Chart(document.getElementById("canvas-chart-bancos"), {
                 type: chartTypes.bancos,
                 data: chartTypes.bancos === 'bar' ? {
@@ -266,10 +296,10 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: textColor } } } }
             });
 
-            // Chart 3: Categorias Donut/Pie
+            // Chart 3: Distribuição Gerencial por Categorias Estruturais
             if (charts.categorias) charts.categorias.destroy();
             const cDesp = state.categorias.filter(c => c.tipo === "despesa");
-
+            
             charts.categorias = new Chart(document.getElementById("canvas-chart-categorias"), {
                 type: chartTypes.categorias,
                 data: {
