@@ -9,17 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-    <!-- MODAL DE EXCLUSÃO -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
             <h3 class="text-lg font-bold text-rose-500 mb-4">Confirmar Exclusão</h3>
-            <p class="text-sm text-slate-400 mb-6">Tem certeza absoluta que deseja remover este(s) item(ns)? Essa ação atualizará a nuvem.</p>
+            <p class="text-sm text-slate-400 mb-6">Tem certeza absoluta que deseja remover este(s) item(ns)? Essa ação atualizará a nuvem imediatamente.</p>
             <div class="flex justify-end gap-3">
                 <button onclick="closeDeleteModal()" class="px-4 py-2 border dark:border-slate-800 rounded-xl text-sm">Cancelar</button>
                 <button id="confirm-delete-btn" class="px-4 py-2 bg-rose-500 text-white rounded-xl text-sm font-bold">Excluir</button>
@@ -27,7 +32,6 @@
         </div>
     </div>
 
-    <!-- SIDEBAR FIXA -->
     <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300">
         <div class="p-5 space-y-6 overflow-y-auto flex-1">
             <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
@@ -44,12 +48,10 @@
         <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500"><span id="sync-status">Sincronizado</span></div>
     </aside>
 
-    <!-- PAINEL CENTRAL -->
     <div class="flex-1 flex flex-col min-w-0">
         <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center"><h2 class="text-lg font-bold">Gestão de Lançamentos</h2></header>
 
         <main class="p-8 space-y-6">
-            <!-- FORMULÁRIO -->
             <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm">
                 <form id="form-add-transacao" onsubmit="addTransaction(event)" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end text-xs">
                     <div><label class="block text-slate-400 font-bold uppercase mb-1">Data</label><input type="date" id="input-tx-data" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
@@ -68,19 +70,20 @@
                 </form>
             </div>
 
-            <!-- INTEGRAÇÃO EXCEL -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div class="bg-white dark:bg-slate-950 p-4 border dark:border-slate-800 rounded-2xl flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Importar Planilha (.xlsx):</span>
-                    <input type="file" onchange="importExcel(event)" class="text-xs text-slate-400">
+                <div class="bg-white dark:bg-slate-950 p-4 border dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
+                    <div class="flex flex-col space-y-1">
+                        <span class="text-slate-400 font-bold">Importação Estruturada de Lote (6.000+ linhas):</span>
+                        <span class="text-[10px] text-slate-500">Colunas A: C/C | B: Discriminação | C: Valores | D: Data | E: Código | F: Mês/Ano</span>
+                    </div>
+                    <input type="file" onchange="importExcel(event)" class="text-xs text-slate-400 cursor-pointer">
                 </div>
-                <button onclick="exportExcel()" class="bg-blue-600 font-bold py-4 rounded-2xl text-white hover:bg-blue-700 transition shadow-md">Exportar Base Filtrada para Excel (.xlsx)</button>
+                <button onclick="exportExcel()" class="bg-blue-600 font-bold py-4 rounded-2xl text-white hover:bg-blue-700 transition shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-file-excel"></i> Exportar Base Ativa para Excel (.xlsx)</button>
             </div>
 
-            <!-- TABELA HISTÓRICO -->
             <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div class="p-5 border-b dark:border-slate-800 flex flex-wrap gap-4 items-center justify-between">
-                    <h4 class="text-sm font-bold">Histórico de Transações</h4>
+                    <h4 class="text-sm font-bold">Histórico Geral de Transações</h4>
                     <div class="flex flex-wrap gap-3 text-xs">
                         <select id="filter-banco" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todos os Bancos</option></select>
                         <select id="filter-categoria" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todas as Categorias</option></select>
@@ -100,26 +103,27 @@
                         <thead class="bg-slate-100 dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 font-bold uppercase">
                             <tr>
                                 <th class="p-4 w-12 text-center"><input type="checkbox" id="master-checkbox" onclick="toggleAllCheckboxes(this)"></th>
-                                <th class="p-4">Data</th><th class="p-4">Tipo</th><th class="p-4">Código</th><th class="p-4">Categoria</th><th class="p-4">Banco</th><th class="p-4">Descrição</th><th class="p-4 text-right">Valor</th><th class="p-4 text-center">% Imp. Mês</th><th class="p-4 text-center">Ações</th>
+                                <th class="p-4">Data</th><th class="p-4">Tipo</th><th class="p-4">Código</th><th class="p-4">Categoria</th><th class="p-4">Banco/Conta</th><th class="p-4">Descrição</th><th class="p-4 text-right">Valor</th><th class="p-4 text-center">% Imp. Mês</th><th class="p-4 text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-transacoes" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-slate-300"></tbody>
+                        <tbody id="tbody-transacoes" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-slate-300">
+                            <tr><td colspan="10" class="p-8 text-center text-slate-500 font-medium">Sincronizando dados com a nuvem...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- BARRA DE AÇÃO EM LOTE -->
     <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-950 text-white px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-6 z-40 border border-slate-800 scale-95 opacity-0 pointer-events-none transition-all duration-300">
         <span class="text-xs font-semibold text-slate-400"><span id="bulk-count">0</span> itens selecionados</span>
-        <button onclick="triggerBulkDelete()" class="bg-rose-600 text-white font-bold text-xs px-4 py-2 rounded-xl transition">Excluir em Lote</button>
+        <button onclick="triggerBulkDelete()" class="bg-rose-600 text-white font-bold text-xs px-4 py-2 rounded-xl transition">Excluir Registros Selecionados</button>
     </div>
 
     <script type="module">
         import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+        import { doc, getDoc, setDoc, collection, getDocs, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         initTheme();
 
@@ -138,12 +142,30 @@
             await loadData();
         });
 
+        // Carga escalável dividida: Puxa metadados do documento e transações da subcoleção dedicada
         async function loadData() {
-            const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
-            if (docSnap.exists()) {
-                state = docSnap.data();
+            try {
+                const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
+                if (docSnap.exists()) {
+                    const metaData = docSnap.data();
+                    state.bancos = metaData.bancos || [];
+                    state.categorias = metaData.categorias || [];
+                }
+
+                // Carrega a subcoleção de transações de forma limpa e assíncrona
+                const txSnapshot = await getDocs(collection(db, "users", targetUid, "workspaces", workspace, "transacoes"));
+                state.transacoes = [];
+                txSnapshot.forEach(doc => {
+                    state.transacoes.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Ordena por data decrescente de visualização
+                state.transacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
+
                 populateFormDropdowns();
                 renderTable();
+            } catch (err) {
+                showToast("Erro de sincronização: " + err.message, "error");
             }
         }
 
@@ -163,21 +185,34 @@
             document.getElementById("input-tx-codigo").value = document.getElementById("input-tx-categoria").value || "";
         };
 
+        // Lançamento manual gravando documento isolado na subcoleção
         window.addTransaction = async function(e) {
             e.preventDefault();
-            state.transacoes.unshift({
-                id: Date.now().toString(),
+            document.getElementById("sync-status").innerText = "Salvando...";
+            
+            const id = Date.now().toString();
+            const txData = {
                 data: document.getElementById("input-tx-data").value,
                 tipo: document.getElementById("input-tx-tipo").value,
                 categoria: document.getElementById("input-tx-codigo").value,
                 banco: document.getElementById("input-tx-banco").value,
                 descricao: document.getElementById("input-tx-descricao").value,
                 valor: parseFloat(document.getElementById("input-tx-valor").value)
-            });
-            await save();
-            renderTable();
-            document.getElementById("form-add-transacao").reset();
-            populateFormDropdowns();
+            };
+
+            try {
+                await setDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id), txData);
+                state.transacoes.unshift({ id, ...txData });
+                
+                document.getElementById("form-add-transacao").reset();
+                document.getElementById("sync-status").innerText = "Sincronizado";
+                showToast("Lançamento salvo na nuvem!", "success");
+                
+                populateFormDropdowns();
+                renderTable();
+            } catch (err) {
+                showToast("Erro ao salvar lançamento.", "error");
+            }
         };
 
         window.renderTable = function() {
@@ -196,20 +231,26 @@
                 return true;
             });
 
-            document.getElementById("tbody-transacoes").innerHTML = filtradas.map(t => {
+            const tbody = document.getElementById("tbody-transacoes");
+            if (filtradas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-500 font-medium">Nenhum registro encontrado para os filtros ativos.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtradas.map(t => {
                 const totalMes = state.transacoes.filter(tx => tx.tipo === "despesa" && tx.data.substring(0,7) === t.data.substring(0,7)).reduce((acc, curr) => acc + curr.valor, 0);
                 const impacto = t.tipo === "despesa" && totalMes > 0 ? ((t.valor / totalMes) * 100).toFixed(1) + "%" : "-";
 
                 return `
-                <tr class="hover:bg-slate-100/5 dark:hover:bg-slate-900/40 transition">
+                <tr class="hover:bg-slate-100/5 dark:hover:bg-slate-900/40 transition text-slate-700 dark:text-slate-300">
                     <td class="p-4 text-center"><input type="checkbox" data-id="${t.id}" onclick="toggleBulkActionBar()" class="row-checkbox cursor-pointer"></td>
                     <td class="p-4">${t.data.split('-').reverse().join('/')}</td>
                     <td class="p-4 font-bold ${t.tipo==='receita'?'text-emerald-500':'text-rose-500'}">${t.tipo.toUpperCase()}</td>
                     <td class="p-4 font-mono text-slate-400">${t.categoria}</td>
                     <td class="p-4 font-semibold">${state.categorias.find(c=>c.codigo===t.categoria)?.nome || 'Outros'}</td>
-                    <td class="p-4">${state.bancos.find(b=>b.codigo===t.banco)?.nome || t.banco}</td>
+                    <td class="p-4 font-medium">${state.bancos.find(b=>b.codigo===t.banco)?.nome || t.banco}</td>
                     <td class="p-4 text-slate-400 max-w-xs truncate">${t.descricao}</td>
-                    <td class="p-4 text-right font-bold">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                    <td class="p-4 text-right font-bold text-slate-900 dark:text-slate-100">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
                     <td class="p-4 text-center text-slate-400">${impacto}</td>
                     <td class="p-4 text-center"><button onclick="openDeleteModal('${t.id}', false)" class="text-rose-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button></td>
                 </tr>`;
@@ -222,17 +263,31 @@
         };
         window.closeDeleteModal = function() { document.getElementById("delete-modal").classList.add("hidden"); };
 
+        // Exclusões escaláveis por ID direto na subcoleção da nuvem
         document.getElementById("confirm-delete-btn").onclick = async function() {
-            if (pendingBulkDelete) {
-                const ids = Array.from(document.querySelectorAll(".row-checkbox:checked")).map(cb => cb.dataset.id);
-                state.transacoes = state.transacoes.filter(t => !ids.includes(t.id));
-                document.getElementById("master-checkbox").checked = false;
-                toggleBulkActionBar();
-            } else {
-                state.transacoes = state.transacoes.filter(t => t.id !== pendingDeleteId);
+            document.getElementById("sync-status").innerText = "Removendo...";
+            try {
+                if (pendingBulkDelete) {
+                    const checkboxes = document.querySelectorAll(".row-checkbox:checked");
+                    const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.id);
+                    
+                    // Executa a remoção massiva via blocos assíncronos se for muito grande
+                    for (const id of idsToDelete) {
+                        await deleteDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id));
+                    }
+                    state.transacoes = state.transacoes.filter(t => !idsToDelete.includes(t.id));
+                    document.getElementById("master-checkbox").checked = false;
+                    toggleBulkActionBar();
+                } else {
+                    await deleteDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", pendingDeleteId));
+                    state.transacoes = state.transacoes.filter(t => t.id !== pendingDeleteId);
+                }
+                showToast("Registros removidos com sucesso!", "success");
+            } catch(e) {
+                showToast("Erro ao excluir dados da nuvem.", "error");
             }
+            document.getElementById("sync-status").innerText = "Sincronizado";
             closeDeleteModal();
-            await save();
             renderTable();
         };
 
@@ -252,90 +307,152 @@
 
         window.triggerBulkDelete = function() { openDeleteModal(null, true); };
 
+        // PARSER DA SUA MATRIZ DE COLUNAS EXCEL COM MOTOR DE BATCH GRÁFICO (CHUNKS DE 500 EM 500)
         window.importExcel = function(e) {
             const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
+            
             reader.onload = async function(evt) {
                 try {
+                    document.getElementById("sync-status").innerText = "Processando Lote...";
                     const workbook = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    let importCount = 0;
-                    let rejectedCount = 0;
-
-                    json.forEach(row => {
-                        const catRef = String(row.Categoria || "").trim();
-                        const bcRef = String(row.Banco || "").trim();
-
-                        const catExists = state.categorias.some(c => c.codigo === catRef);
-                        const bcExists = state.bancos.some(b => b.codigo === bcRef);
-
-                        if(row.Data && row.Tipo && row.Valor && catExists && bcExists) {
-                            state.transacoes.push({
-                                id: Date.now().toString() + Math.random(),
-                                data: String(row.Data).trim(),
-                                tipo: String(row.Tipo).toLowerCase().trim(),
-                                categoria: catRef,
-                                banco: bcRef,
-                                descricao: String(row.Descrição || "Lote Excel").trim(),
-                                valor: parseFloat(row.Valor)
-                            });
-                            importCount++;
-                        } else {
-                            rejectedCount++;
-                        }
-                    });
-
-                    await save();
-                    renderTable();
-                    if(rejectedCount > 0) {
-                        showToast(`${importCount} importados. ${rejectedCount} linhas rejeitadas (Cód. Banco/Categoria inválido).`, "error");
-                    } else {
-                        showToast(`${importCount} lançamentos importados com sucesso!`, "success");
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Converte em array de arrays puro para seguir a ordem estrita das colunas (A a F)
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }); 
+                    
+                    if(rows.length <= 1) {
+                        showToast("A planilha selecionada está vazia.", "error");
+                        return;
                     }
-                } catch(err) { showToast("Planilha em formato inválido.", "error"); }
+
+                    let batch = writeBatch(db);
+                    let counter = 0;
+                    let totalImported = 0;
+                    
+                    let workspaceUpdated = false;
+
+                    // Ignora a linha 0 (cabeçalho) e inicia a varredura das 6.000+ linhas
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length < 4) continue; // Pula linhas corrompidas ou em branco
+
+                        // MAPEAMENTO DIRETO CONFORME SEU ARQUIVO
+                        let rawBanco = String(row[0] || "001").trim(); // Coluna A: C/C (Ex: 36997-PJ)
+                        let rawDescricao = String(row[1] || "Lote Corporativo").trim(); // Coluna B: DISCRIMINAÇÃO
+                        let rawValor = parseFloat(String(row[2]).replace(',', '.')); // Coluna C: VALORES
+                        let rawData = row[3]; // Coluna D: DATA
+                        let rawCodigo = String(row[4] || "1.01").trim(); // Coluna E: CÓDIGO DO VALOR
+
+                        if (isNaN(rawValor)) continue;
+
+                        // Padronizador de Instâncias Inteligentes de Data (String ou Serial Excel)
+                        let dataFormatada = "";
+                        if (!isNaN(rawData) && Number(rawData) > 40000) {
+                            const dateObj = new Date((Number(rawData) - 25569) * 86400 * 1000);
+                            dataFormatada = dateObj.toISOString().split('T')[0];
+                        } else {
+                            let strDate = String(rawData).trim();
+                            if (strDate.includes('/')) {
+                                const parts = strDate.split('/');
+                                dataFormatada = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                            } else {
+                                dataFormatada = strDate;
+                            }
+                        }
+
+                        // Detector automático de Tipo baseado no sinal da planilha ou código gerencial
+                        let tipoDetected = "receita";
+                        if (rawValor < 0 || rawCodigo.startsWith('2')) {
+                            tipoDetected = "despesa";
+                            rawValor = Math.abs(rawValor); // Salva o valor absoluto positivo
+                        }
+
+                        // REGISTRO AUTOMÁTICO DE NOVAS CONTAS BANCÁRIAS (Prevenção de Erros de Validação)
+                        if (!state.bancos.some(b => b.codigo === rawBanco)) {
+                            state.bancos.push({ codigo: rawBanco, nome: "Conta " + rawBanco });
+                            workspaceUpdated = true;
+                        }
+
+                        // REGISTRO AUTOMÁTICO DE CATEGORIAS DESCONHECIDAS
+                        if (!state.categorias.some(c => c.codigo === rawCodigo)) {
+                            state.categorias.push({ codigo: rawCodigo, nome: "Código " + rawCodigo, tipo: tipoDetected });
+                            workspaceUpdated = true;
+                        }
+
+                        const txId = (Date.now() + totalImported + Math.random()).toString().replace('.', '');
+                        const newTxDoc = {
+                            data: dataFormatada,
+                            tipo: tipoDetected,
+                            categoria: rawCodigo,
+                            banco: rawBanco,
+                            descricao: rawDescricao,
+                            valor: rawValor
+                        };
+
+                        // Adiciona a transação ao lote atual do Firebase
+                        const docRef = doc(db, "users", targetUid, "workspaces", workspace, "transacoes", txId);
+                        batch.set(docRef, newTxDoc);
+                        
+                        // Atualiza a memória local para renderizar imediatamente na tabela sem novo fetch
+                        state.transacoes.push({ id: txId, ...newTxDoc });
+
+                        counter++;
+                        totalImported++;
+
+                        // Se atingir o limite rígido de 500 do Firebase, despacha o lote e inicia o próximo
+                        if (counter === 500) {
+                            await batch.commit();
+                            batch = writeBatch(db);
+                            counter = 0;
+                        }
+                    }
+
+                    // Envia os registros remanescentes do último bloco
+                    if (counter > 0) {
+                        await batch.commit();
+                    }
+
+                    // Se novas contas/categorias foram criadas em lote, atualiza o documento mestre do Workspace
+                    if (workspaceUpdated) {
+                        await setDoc(doc(db, "users", targetUid, "workspaces", workspace), {
+                            bancos: state.bancos,
+                            categorias: state.categorias
+                        }, { merge: true });
+                    }
+
+                    state.transacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
+                    document.getElementById("sync-status").innerText = "Sincronizado";
+                    showToast(`${totalImported} linhas processadas e salvas em lote!`, "success");
+                    
+                    populateFormDropdowns();
+                    renderTable();
+                } catch (err) {
+                    showToast("Falha crítica no lote do Excel: " + err.message, "error");
+                    document.getElementById("sync-status").innerText = "Sincronizado";
+                }
             };
             reader.readAsArrayBuffer(file);
         };
 
         window.exportExcel = function() {
-            const fBanco = document.getElementById("filter-banco").value;
-            const fCat = document.getElementById("filter-categoria").value;
-            const fTipo = document.getElementById("filter-tipo").value;
-            const fIni = document.getElementById("filter-data-inicio").value;
-            const fFim = document.getElementById("filter-data-fim").value;
-
-            let filtradas = state.transacoes.filter(t => {
-                if (fBanco && t.banco !== fBanco) return false;
-                if (fCat && t.categoria !== fCat) return false;
-                if (fTipo && t.tipo !== fTipo) return false;
-                if (fIni && t.data < fIni) return false;
-                if (fFim && t.data > fFim) return false;
-                return true;
-            });
-
-            const formatados = filtradas.map(t => ({
+            if (state.transacoes.length === 0) { showToast("Sem lançamentos ativos.", "error"); return; }
+            const worksheet = XLSX.utils.json_to_sheet(state.transacoes.map(t => ({
                 Data: t.data, Tipo: t.tipo.toUpperCase(), Categoria: t.categoria, Banco: t.banco, Descrição: t.descricao, Valor: t.valor
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(formatados);
+            })));
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Filtro Ativo");
-            XLSX.writeFile(workbook, `LampFinance_Filtrado_${workspace}.xlsx`);
-            showToast("Planilha gerada!", "success");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Lançamentos");
+            XLSX.writeFile(workbook, `LampFinance_Export.xlsx`);
         };
-
-        async function save() {
-            await setDoc(doc(db, "users", targetUid, "workspaces", workspace), state);
-            showToast("Dados salvos com sucesso!", "success");
-        }
 
         function showToast(message, type = "success") {
             const container = document.getElementById("toast-container");
             const toast = document.createElement("div");
-            toast.className = `bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300`;
+            const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 pointer-events-auto`;
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
+            setTimeout(() => toast.remove(), 4000);
         }
     </script>
 </body>
