@@ -5,7 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Lançamentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -17,22 +34,27 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased select-none">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <div id="support-banner" class="hidden bg-amber-500 text-slate-950 font-semibold px-4 py-2.5 text-center text-sm shadow-md fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 transition-all duration-300">
+        <span><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> <strong>MODO SUPORTE ATIVO:</strong> Você está editando a conta de <span id="support-user-email" class="underline font-bold"></span>.</span>
+        <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair do Modo Suporte</button>
+    </div>
 
     <div id="delete-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
             <h3 class="text-lg font-bold text-rose-500 mb-4">Confirmar Exclusão</h3>
             <p class="text-sm text-slate-400 mb-6">Tem certeza absoluta que deseja remover este(s) item(ns)? Essa ação atualizará a nuvem imediatamente.</p>
             <div class="flex justify-end gap-3">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 border dark:border-slate-800 rounded-xl text-sm">Cancelar</button>
+                <button onclick="closeDeleteModal()" class="px-4 py-2 border dark:border-slate-800 rounded-xl text-sm text-slate-400">Cancelar</button>
                 <button id="confirm-delete-btn" class="px-4 py-2 bg-rose-500 text-white rounded-xl text-sm font-bold">Excluir</button>
             </div>
         </div>
     </div>
 
-    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300">
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30">
         <div class="p-5 space-y-6 overflow-y-auto flex-1">
             <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
                 <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
@@ -45,26 +67,40 @@
                 <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
             </nav>
         </div>
-        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500"><span id="sync-status">Sincronizado</span></div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+            <span id="sync-status">Sincronizado</span>
+            <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+        </div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
-        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center"><h2 class="text-lg font-bold">Gestão de Lançamentos</h2></header>
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center z-20">
+            <h2 class="text-lg font-bold">Gestão de Lançamentos</h2>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold"><i class="fa-solid fa-user"></i></div>
+                    <span id="user-display-email" class="font-medium text-slate-500 dark:text-slate-400">Verificando...</span>
+                </div>
+            </div>
+        </header>
 
-        <main class="p-8 space-y-6">
+        <main class="p-8 space-y-6 mt-4">
             <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm">
                 <form id="form-add-transacao" onsubmit="addTransaction(event)" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end text-xs">
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Data</label><input type="date" id="input-tx-data" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Data</label><input type="date" id="input-tx-data" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></div>
                     <div>
                         <label class="block text-slate-400 font-bold uppercase mb-1">Tipo</label>
-                        <select id="input-tx-tipo" onchange="populateFormDropdowns()" class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none">
+                        <select id="input-tx-tipo" onchange="populateFormDropdowns()" class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500">
                             <option value="receita">Receita (+)</option><option value="despesa">Despesa (-)</option>
                         </select>
                     </div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Categoria</label><select id="input-tx-categoria" onchange="autoFillCategoryCode()" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></select></div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Banco</label><select id="input-tx-banco" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></select></div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Descrição</label><input type="text" id="input-tx-descricao" placeholder="Histórico" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Valor</label><input type="number" step="0.01" id="input-tx-valor" placeholder="0,00" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Categoria</label><select id="input-tx-categoria" onchange="autoFillCategoryCode()" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></select></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Banco</label><select id="input-tx-banco" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></select></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Descrição</label><input type="text" id="input-tx-descricao" placeholder="Histórico" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Valor</label><input type="number" step="0.01" id="input-tx-valor" placeholder="0,00" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></div>
                     <input type="hidden" id="input-tx-codigo">
                     <div class="md:col-span-6 flex justify-end"><button type="submit" class="bg-emerald-500 text-slate-950 font-bold py-2.5 px-6 rounded-xl shadow-md">Lançar Registro</button></div>
                 </form>
@@ -122,7 +158,7 @@
 
     <script type="module">
         import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
         import { doc, getDoc, setDoc, collection, getDocs, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         initTheme();
@@ -131,18 +167,35 @@
         let targetUid = ""; let workspace = "";
         let pendingDeleteId = null; let pendingBulkDelete = false;
 
+        // AJUSTE CRUCIAL: Adicionado um atraso sutil e verificação segura para evitar o falso negativo do token
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = "index.html"; return; }
+            if (!user) {
+                // Pequena tolerância assíncrona caso o Firebase esteja revalidando tokens entre abas
+                setTimeout(() => {
+                    if (!auth.currentUser) window.location.href = "index.html";
+                }, 500);
+                return;
+            }
+            
+            document.getElementById("user-display-email").innerText = user.email;
+
+            // Ativação visual do Modo Suporte persistido por aba
+            const impUid = sessionStorage.getItem("impersonatedUid");
+            const impEmail = sessionStorage.getItem("impersonatedEmail");
+            if (impUid && user.email === ADMIN_EMAIL) {
+                document.getElementById("support-banner").classList.remove("hidden");
+                document.getElementById("support-user-email").innerText = impEmail;
+            }
+
             if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel-btn").classList.remove("hidden");
             
-            targetUid = sessionStorage.getItem("impersonatedUid") || user.uid;
+            targetUid = impUid || user.uid;
             workspace = localStorage.getItem("workspace") || "empresa";
             if (workspace === "pessoal") document.getElementById("menu-dre-btn").classList.add("hidden");
 
             await loadData();
         });
 
-        // Carga escalável dividida: Puxa metadados do documento e transações da subcoleção dedicada
         async function loadData() {
             try {
                 const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
@@ -152,14 +205,12 @@
                     state.categorias = metaData.categorias || [];
                 }
 
-                // Carrega a subcoleção de transações de forma limpa e assíncrona
                 const txSnapshot = await getDocs(collection(db, "users", targetUid, "workspaces", workspace, "transacoes"));
                 state.transacoes = [];
                 txSnapshot.forEach(doc => {
                     state.transacoes.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Ordena por data decrescente de visualização
                 state.transacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
 
                 populateFormDropdowns();
@@ -185,7 +236,6 @@
             document.getElementById("input-tx-codigo").value = document.getElementById("input-tx-categoria").value || "";
         };
 
-        // Lançamento manual gravando documento isolado na subcoleção
         window.addTransaction = async function(e) {
             e.preventDefault();
             document.getElementById("sync-status").innerText = "Salvando...";
@@ -263,7 +313,6 @@
         };
         window.closeDeleteModal = function() { document.getElementById("delete-modal").classList.add("hidden"); };
 
-        // Exclusões escaláveis por ID direto na subcoleção da nuvem
         document.getElementById("confirm-delete-btn").onclick = async function() {
             document.getElementById("sync-status").innerText = "Removendo...";
             try {
@@ -271,7 +320,6 @@
                     const checkboxes = document.querySelectorAll(".row-checkbox:checked");
                     const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.id);
                     
-                    // Executa a remoção massiva via blocos assíncronos se for muito grande
                     for (const id of idsToDelete) {
                         await deleteDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id));
                     }
@@ -307,7 +355,6 @@
 
         window.triggerBulkDelete = function() { openDeleteModal(null, true); };
 
-        // PARSER DA SUA MATRIZ DE COLUNAS EXCEL COM MOTOR DE BATCH GRÁFICO (CHUNKS DE 500 EM 500)
         window.importExcel = function(e) {
             const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -317,8 +364,6 @@
                     document.getElementById("sync-status").innerText = "Processando Lote...";
                     const workbook = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    
-                    // Converte em array de arrays puro para seguir a ordem estrita das colunas (A a F)
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }); 
                     
                     if(rows.length <= 1) {
@@ -329,24 +374,20 @@
                     let batch = writeBatch(db);
                     let counter = 0;
                     let totalImported = 0;
-                    
                     let workspaceUpdated = false;
 
-                    // Ignora a linha 0 (cabeçalho) e inicia a varredura das 6.000+ linhas
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
-                        if (!row || row.length < 4) continue; // Pula linhas corrompidas ou em branco
+                        if (!row || row.length < 4) continue;
 
-                        // MAPEAMENTO DIRETO CONFORME SEU ARQUIVO
-                        let rawBanco = String(row[0] || "001").trim(); // Coluna A: C/C (Ex: 36997-PJ)
-                        let rawDescricao = String(row[1] || "Lote Corporativo").trim(); // Coluna B: DISCRIMINAÇÃO
-                        let rawValor = parseFloat(String(row[2]).replace(',', '.')); // Coluna C: VALORES
-                        let rawData = row[3]; // Coluna D: DATA
-                        let rawCodigo = String(row[4] || "1.01").trim(); // Coluna E: CÓDIGO DO VALOR
+                        let rawBanco = String(row[0] || "001").trim(); 
+                        let rawDescricao = String(row[1] || "Lote Corporativo").trim(); 
+                        let rawValor = parseFloat(String(row[2]).replace(',', '.')); 
+                        let rawData = row[3]; 
+                        let rawCodigo = String(row[4] || "1.01").trim(); 
 
                         if (isNaN(rawValor)) continue;
 
-                        // Padronizador de Instâncias Inteligentes de Data (String ou Serial Excel)
                         let dataFormatada = "";
                         if (!isNaN(rawData) && Number(rawData) > 40000) {
                             const dateObj = new Date((Number(rawData) - 25569) * 86400 * 1000);
@@ -361,20 +402,17 @@
                             }
                         }
 
-                        // Detector automático de Tipo baseado no sinal da planilha ou código gerencial
                         let tipoDetected = "receita";
                         if (rawValor < 0 || rawCodigo.startsWith('2')) {
                             tipoDetected = "despesa";
-                            rawValor = Math.abs(rawValor); // Salva o valor absoluto positivo
+                            rawValor = Math.abs(rawValor);
                         }
 
-                        // REGISTRO AUTOMÁTICO DE NOVAS CONTAS BANCÁRIAS (Prevenção de Erros de Validação)
                         if (!state.bancos.some(b => b.codigo === rawBanco)) {
                             state.bancos.push({ codigo: rawBanco, nome: "Conta " + rawBanco });
                             workspaceUpdated = true;
                         }
 
-                        // REGISTRO AUTOMÁTICO DE CATEGORIAS DESCONHECIDAS
                         if (!state.categorias.some(c => c.codigo === rawCodigo)) {
                             state.categorias.push({ codigo: rawCodigo, nome: "Código " + rawCodigo, tipo: tipoDetected });
                             workspaceUpdated = true;
@@ -390,17 +428,13 @@
                             valor: rawValor
                         };
 
-                        // Adiciona a transação ao lote atual do Firebase
                         const docRef = doc(db, "users", targetUid, "workspaces", workspace, "transacoes", txId);
                         batch.set(docRef, newTxDoc);
-                        
-                        // Atualiza a memória local para renderizar imediatamente na tabela sem novo fetch
                         state.transacoes.push({ id: txId, ...newTxDoc });
 
                         counter++;
                         totalImported++;
 
-                        // Se atingir o limite rígido de 500 do Firebase, despacha o lote e inicia o próximo
                         if (counter === 500) {
                             await batch.commit();
                             batch = writeBatch(db);
@@ -408,12 +442,8 @@
                         }
                     }
 
-                    // Envia os registros remanescentes do último bloco
-                    if (counter > 0) {
-                        await batch.commit();
-                    }
+                    if (counter > 0) await batch.commit();
 
-                    // Se novas contas/categorias foram criadas em lote, atualiza o documento mestre do Workspace
                     if (workspaceUpdated) {
                         await setDoc(doc(db, "users", targetUid, "workspaces", workspace), {
                             bancos: state.bancos,
@@ -428,7 +458,7 @@
                     populateFormDropdowns();
                     renderTable();
                 } catch (err) {
-                    showToast("Falha crítica no lote do Excel: " + err.message, "error");
+                    showToast("Falha no lote do Excel.", "error");
                     document.getElementById("sync-status").innerText = "Sincronizado";
                 }
             };
@@ -445,6 +475,21 @@
             XLSX.writeFile(workbook, `LampFinance_Export.xlsx`);
         };
 
+        window.toggleTheme = function() {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        };
+
+        window.exitImpersonation = function() {
+            sessionStorage.removeItem("impersonatedUid");
+            sessionStorage.removeItem("impersonatedEmail");
+            window.location.href = "admin.html";
+        };
+
+        window.handleLogout = async function() {
+            await signOut(auth);
+        };
+
         function showToast(message, type = "success") {
             const container = document.getElementById("toast-container");
             const toast = document.createElement("div");
@@ -452,7 +497,7 @@
             toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 pointer-events-auto`;
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
+            setTimeout(() => toast.remove(), 3500);
         }
     </script>
 </body>
