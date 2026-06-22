@@ -90,17 +90,17 @@
         <main class="p-8 space-y-6 mt-4">
             <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm">
                 <form id="form-add-transacao" onsubmit="addTransaction(event)" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end text-xs">
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Data</label><input type="date" id="input-tx-data" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Data</label><input type="date" id="input-tx-data" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
                     <div>
                         <label class="block text-slate-400 font-bold uppercase mb-1">Tipo</label>
-                        <select id="input-tx-tipo" onchange="populateFormDropdowns()" class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500">
+                        <select id="input-tx-tipo" onchange="populateFormDropdowns()" class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none">
                             <option value="receita">Receita (+)</option><option value="despesa">Despesa (-)</option>
                         </select>
                     </div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Categoria</label><select id="input-tx-categoria" onchange="autoFillCategoryCode()" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></select></div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Banco</label><select id="input-tx-banco" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></select></div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Descrição</label><input type="text" id="input-tx-descricao" placeholder="Histórico" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></div>
-                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Valor</label><input type="number" step="0.01" id="input-tx-valor" placeholder="0,00" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-500"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Categoria</label><select id="input-tx-categoria" onchange="autoFillCategoryCode()" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></select></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Banco</label><select id="input-tx-banco" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></select></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Descrição</label><input type="text" id="input-tx-descricao" placeholder="Histórico" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold uppercase mb-1">Valor</label><input type="number" step="0.01" id="input-tx-valor" placeholder="0,00" required class="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none"></div>
                     <input type="hidden" id="input-tx-codigo">
                     <div class="md:col-span-6 flex justify-end"><button type="submit" class="bg-emerald-500 text-slate-950 font-bold py-2.5 px-6 rounded-xl shadow-md">Lançar Registro</button></div>
                 </form>
@@ -121,15 +121,15 @@
                 <div class="p-5 border-b dark:border-slate-800 flex flex-wrap gap-4 items-center justify-between">
                     <h4 class="text-sm font-bold">Histórico Geral de Transações</h4>
                     <div class="flex flex-wrap gap-3 text-xs">
-                        <select id="filter-banco" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todos os Bancos</option></select>
-                        <select id="filter-categoria" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todas as Categorias</option></select>
-                        <select id="filter-tipo" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400">
+                        <select id="filter-banco" onchange="resetPageAndRender()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todos os Bancos</option></select>
+                        <select id="filter-categoria" onchange="resetPageAndRender()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400"><option value="">Todas as Categorias</option></select>
+                        <select id="filter-tipo" onchange="resetPageAndRender()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-2 focus:outline-none text-slate-400">
                             <option value="">Todos os Tipos</option><option value="receita">Receitas</option><option value="despesa">Despesas</option>
                         </select>
                         <div class="flex items-center gap-1">
-                            <input type="date" id="filter-data-inicio" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-1.5 text-slate-400">
+                            <input type="date" id="filter-data-inicio" onchange="resetPageAndRender()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-1.5 text-slate-400">
                             <span class="text-slate-500">a</span>
-                            <input type="date" id="filter-data-fim" onchange="renderTable()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-1.5 text-slate-400">
+                            <input type="date" id="filter-data-fim" onchange="resetPageAndRender()" class="bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-lg p-1.5 text-slate-400">
                         </div>
                     </div>
                 </div>
@@ -146,6 +146,14 @@
                             <tr><td colspan="10" class="p-8 text-center text-slate-500 font-medium">Sincronizando dados com a nuvem...</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="p-4 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold">
+                    <span class="text-slate-400">Mostrando registros de <span id="page-start">0</span> a <span id="page-end">0</span> de um total de <span id="page-total">0</span></span>
+                    <div class="flex gap-2">
+                        <button onclick="prevPage()" type="button" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 border dark:border-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all">Anterior</button>
+                        <button onclick="nextPage()" type="button" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 border dark:border-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all">Próximo</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -164,13 +172,16 @@
         initTheme();
 
         let state = { transacoes: [], bancos: [], categorias: [] };
+        let filteredTransactions = [];
         let targetUid = ""; let workspace = "";
         let pendingDeleteId = null; let pendingBulkDelete = false;
+        
+        // Parâmetros do limitador de paginação
+        let currentPage = 1;
+        const rowsPerPage = 50;
 
-        // AJUSTE CRUCIAL: Adicionado um atraso sutil e verificação segura para evitar o falso negativo do token
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                // Pequena tolerância assíncrona caso o Firebase esteja revalidando tokens entre abas
                 setTimeout(() => {
                     if (!auth.currentUser) window.location.href = "index.html";
                 }, 500);
@@ -179,7 +190,6 @@
             
             document.getElementById("user-display-email").innerText = user.email;
 
-            // Ativação visual do Modo Suporte persistido por aba
             const impUid = sessionStorage.getItem("impersonatedUid");
             const impEmail = sessionStorage.getItem("impersonatedEmail");
             if (impUid && user.email === ADMIN_EMAIL) {
@@ -214,7 +224,7 @@
                 state.transacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
 
                 populateFormDropdowns();
-                renderTable();
+                resetPageAndRender();
             } catch (err) {
                 showToast("Erro de sincronização: " + err.message, "error");
             }
@@ -234,6 +244,82 @@
 
         window.autoFillCategoryCode = function() {
             document.getElementById("input-tx-codigo").value = document.getElementById("input-tx-categoria").value || "";
+        };
+
+        window.resetPageAndRender = function() {
+            currentPage = 1;
+            const fBanco = document.getElementById("filter-banco").value;
+            const fCat = document.getElementById("filter-categoria").value;
+            const fTipo = document.getElementById("filter-tipo").value;
+            const fIni = document.getElementById("filter-data-inicio").value;
+            const fFim = document.getElementById("filter-data-fim").value;
+
+            filteredTransactions = state.transacoes.filter(t => {
+                if (fBanco && t.banco !== fBanco) return false;
+                if (fCat && t.categoria !== fCat) return false;
+                if (fTipo && t.tipo !== fTipo) return false;
+                if (fIni && t.data < fIni) return false;
+                if (fFim && t.data > fFim) return false;
+                return true;
+            });
+
+            renderTable();
+        };
+
+        // ENGINE DE RENDERIZAÇÃO INTELIGENTE (MAX 50 LINHAS SIMULTÂNEAS)
+        window.renderTable = function() {
+            const total = filteredTransactions.length;
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = Math.min(start + rowsPerPage, total);
+
+            document.getElementById("page-start").innerText = total > 0 ? start + 1 : 0;
+            document.getElementById("page-end").innerText = end;
+            document.getElementById("page-total").innerText = total;
+
+            const slice = filteredTransactions.slice(start, end);
+            const tbody = document.getElementById("tbody-transacoes");
+
+            if (slice.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-500 font-medium">Nenhum registro encontrado para os filtros ativos.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = slice.map(t => {
+                const totalMes = state.transacoes.filter(tx => tx.tipo === "despesa" && tx.data.substring(0,7) === t.data.substring(0,7)).reduce((acc, curr) => acc + curr.valor, 0);
+                const impacto = t.tipo === "despesa" && totalMes > 0 ? ((t.valor / totalMes) * 100).toFixed(1) + "%" : "-";
+
+                return `
+                <tr class="hover:bg-slate-100/5 dark:hover:bg-slate-900/40 transition text-slate-700 dark:text-slate-300">
+                    <td class="p-4 text-center"><input type="checkbox" data-id="${t.id}" onclick="toggleBulkActionBar()" class="row-checkbox cursor-pointer"></td>
+                    <td class="p-4">${t.data.split('-').reverse().join('/')}</td>
+                    <td class="p-4 font-bold ${t.tipo==='receita'?'text-emerald-500':'text-rose-500'}">${t.tipo.toUpperCase()}</td>
+                    <td class="p-4 font-mono text-slate-400">${t.categoria}</td>
+                    <td class="p-4 font-semibold">${state.categorias.find(c=>c.codigo===t.categoria)?.nome || 'Outros'}</td>
+                    <td class="p-4 font-medium">${state.bancos.find(b=>b.codigo===t.banco)?.nome || t.banco}</td>
+                    <td class="p-4 text-slate-400 max-w-xs truncate">${t.descricao}</td>
+                    <td class="p-4 text-right font-bold text-slate-900 dark:text-slate-100">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                    <td class="p-4 text-center text-slate-400">${impacto}</td>
+                    <td class="p-4 text-center"><button onclick="openDeleteModal('${t.id}', false)" class="text-rose-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button></td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.nextPage = function() {
+            if ((currentPage * rowsPerPage) < filteredTransactions.length) { 
+                currentPage++; 
+                renderTable(); 
+                document.getElementById("master-checkbox").checked = false;
+                toggleBulkActionBar();
+            }
+        };
+
+        window.prevPage = function() {
+            if (currentPage > 1) { 
+                currentPage--; 
+                renderTable(); 
+                document.getElementById("master-checkbox").checked = false;
+                toggleBulkActionBar();
+            }
         };
 
         window.addTransaction = async function(e) {
@@ -259,84 +345,51 @@
                 showToast("Lançamento salvo na nuvem!", "success");
                 
                 populateFormDropdowns();
-                renderTable();
+                resetPageAndRender();
             } catch (err) {
                 showToast("Erro ao salvar lançamento.", "error");
             }
         };
 
-        window.renderTable = function() {
-            const fBanco = document.getElementById("filter-banco").value;
-            const fCat = document.getElementById("filter-categoria").value;
-            const fTipo = document.getElementById("filter-tipo").value;
-            const fIni = document.getElementById("filter-data-inicio").value;
-            const fFim = document.getElementById("filter-data-fim").value;
-
-            let filtradas = state.transacoes.filter(t => {
-                if (fBanco && t.banco !== fBanco) return false;
-                if (fCat && t.categoria !== fCat) return false;
-                if (fTipo && t.tipo !== fTipo) return false;
-                if (fIni && t.data < fIni) return false;
-                if (fFim && t.data > fFim) return false;
-                return true;
-            });
-
-            const tbody = document.getElementById("tbody-transacoes");
-            if (filtradas.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-500 font-medium">Nenhum registro encontrado para os filtros ativos.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filtradas.map(t => {
-                const totalMes = state.transacoes.filter(tx => tx.tipo === "despesa" && tx.data.substring(0,7) === t.data.substring(0,7)).reduce((acc, curr) => acc + curr.valor, 0);
-                const impacto = t.tipo === "despesa" && totalMes > 0 ? ((t.valor / totalMes) * 100).toFixed(1) + "%" : "-";
-
-                return `
-                <tr class="hover:bg-slate-100/5 dark:hover:bg-slate-900/40 transition text-slate-700 dark:text-slate-300">
-                    <td class="p-4 text-center"><input type="checkbox" data-id="${t.id}" onclick="toggleBulkActionBar()" class="row-checkbox cursor-pointer"></td>
-                    <td class="p-4">${t.data.split('-').reverse().join('/')}</td>
-                    <td class="p-4 font-bold ${t.tipo==='receita'?'text-emerald-500':'text-rose-500'}">${t.tipo.toUpperCase()}</td>
-                    <td class="p-4 font-mono text-slate-400">${t.categoria}</td>
-                    <td class="p-4 font-semibold">${state.categorias.find(c=>c.codigo===t.categoria)?.nome || 'Outros'}</td>
-                    <td class="p-4 font-medium">${state.bancos.find(b=>b.codigo===t.banco)?.nome || t.banco}</td>
-                    <td class="p-4 text-slate-400 max-w-xs truncate">${t.descricao}</td>
-                    <td class="p-4 text-right font-bold text-slate-900 dark:text-slate-100">R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                    <td class="p-4 text-center text-slate-400">${impacto}</td>
-                    <td class="p-4 text-center"><button onclick="openDeleteModal('${t.id}', false)" class="text-rose-500 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button></td>
-                </tr>`;
-            }).join('');
-        };
-
-        window.openDeleteModal = function(id, isBulk) {
-            pendingDeleteId = id; pendingBulkDelete = isBulk;
-            document.getElementById("delete-modal").classList.remove("hidden");
-        };
-        window.closeDeleteModal = function() { document.getElementById("delete-modal").classList.add("hidden"); };
-
+        // ENGINE DE DELEÇÃO MASSIVA VIA BATCHES ASSÍNCRONOS DE 500 REGISTROS
         document.getElementById("confirm-delete-btn").onclick = async function() {
             document.getElementById("sync-status").innerText = "Removendo...";
+            closeDeleteModal();
+            
             try {
                 if (pendingBulkDelete) {
                     const checkboxes = document.querySelectorAll(".row-checkbox:checked");
                     const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.id);
                     
+                    let batch = writeBatch(db);
+                    let counter = 0;
+
                     for (const id of idsToDelete) {
-                        await deleteDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id));
+                        batch.delete(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id));
+                        counter++;
+
+                        if (counter === 500) {
+                            await batch.commit();
+                            batch = writeBatch(db);
+                            counter = 0;
+                        }
                     }
+                    if (counter > 0) await batch.commit();
+
                     state.transacoes = state.transacoes.filter(t => !idsToDelete.includes(t.id));
                     document.getElementById("master-checkbox").checked = false;
                     toggleBulkActionBar();
+                    showToast(`${idsToDelete.length} registros eliminados com sucesso!`, "success");
                 } else {
                     await deleteDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", pendingDeleteId));
                     state.transacoes = state.transacoes.filter(t => t.id !== pendingDeleteId);
+                    showToast("Lançamento individual removido!", "success");
                 }
-                showToast("Registros removidos com sucesso!", "success");
             } catch(e) {
-                showToast("Erro ao excluir dados da nuvem.", "error");
+                showToast("Erro ao processar lote de exclusão.", "error");
             }
             document.getElementById("sync-status").innerText = "Sincronizado";
-            closeDeleteModal();
-            renderTable();
+            resetPageAndRender();
         };
 
         window.toggleAllCheckboxes = function(master) {
@@ -403,7 +456,7 @@
                         }
 
                         let tipoDetected = "receita";
-                        if (rawValor < 0 || rawCodigo.startsWith('2')) {
+                        if (rawValor < 0 || rawCodigo.startsWith('2') || rawCodigo.startsWith('3')) {
                             tipoDetected = "despesa";
                             rawValor = Math.abs(rawValor);
                         }
@@ -456,23 +509,13 @@
                     showToast(`${totalImported} linhas processadas e salvas em lote!`, "success");
                     
                     populateFormDropdowns();
-                    renderTable();
+                    resetPageAndRender();
                 } catch (err) {
-                    showToast("Falha no lote do Excel.", "error");
+                    showToast("Falha crítica no lote do Excel.", "error");
                     document.getElementById("sync-status").innerText = "Sincronizado";
                 }
             };
             reader.readAsArrayBuffer(file);
-        };
-
-        window.exportExcel = function() {
-            if (state.transacoes.length === 0) { showToast("Sem lançamentos ativos.", "error"); return; }
-            const worksheet = XLSX.utils.json_to_sheet(state.transacoes.map(t => ({
-                Data: t.data, Tipo: t.tipo.toUpperCase(), Categoria: t.categoria, Banco: t.banco, Descrição: t.descricao, Valor: t.valor
-            })));
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Lançamentos");
-            XLSX.writeFile(workbook, `LampFinance_Export.xlsx`);
         };
 
         window.toggleTheme = function() {
@@ -480,25 +523,9 @@
             localStorage.setItem("theme", isDark ? "dark" : "light");
         };
 
-        window.exitImpersonation = function() {
-            sessionStorage.removeItem("impersonatedUid");
-            sessionStorage.removeItem("impersonatedEmail");
-            window.location.href = "admin.html";
-        };
-
         window.handleLogout = async function() {
             await signOut(auth);
         };
-
-        function showToast(message, type = "success") {
-            const container = document.getElementById("toast-container");
-            const toast = document.createElement("div");
-            const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
-            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 pointer-events-auto`;
-            toast.innerHTML = `<span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
-        }
     </script>
 </body>
 </html>
