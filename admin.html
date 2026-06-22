@@ -5,36 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LampFinance - Console Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased select-none">
 
-    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0">
-        <div class="p-5 space-y-6 flex-1">
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <aside class="w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30">
+        <div class="p-5 space-y-6 overflow-y-auto flex-1">
             <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
                 <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
             <nav class="space-y-1">
-                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
-                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
-                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
-                <a href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
-                <a href="admin.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 bg-amber-500/5"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
+                <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard</a>
+                <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-receipt w-5 text-center"></i> Lançamentos</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-sliders w-5 text-center"></i> Configurações</a>
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> DRE Dinâmico</a>
+                <a href="admin.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 bg-amber-500/5 transition-all"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Painel Admin</a>
             </nav>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+            <span>Sincronizado</span>
+            <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
         </div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
-        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center">
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center z-20">
             <h2 class="text-lg font-bold text-amber-500">Console de Auditoria SaaS</h2>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center font-bold"><i class="fa-solid fa-shield-halved"></i></div>
+                    <span id="user-display-email" class="font-medium text-slate-500 dark:text-slate-400">Verificando...</span>
+                </div>
+            </div>
         </header>
 
         <main class="p-8">
             <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
+                <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800/50">
+                    <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
                         <thead class="bg-slate-100 dark:bg-slate-900 text-slate-400 font-bold uppercase">
                             <tr>
                                 <th class="p-4">UID do Usuário</th>
@@ -42,7 +81,9 @@
                                 <th class="p-4 text-center">Ação de Suporte</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-admin-users" class="divide-y divide-slate-100 dark:divide-slate-800/40"></tbody>
+                        <tbody id="tbody-admin-users" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-slate-700 dark:text-slate-300 font-medium">
+                            <tr><td colspan="3" class="p-6 text-center text-slate-500">Buscando base de perfis...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -51,39 +92,49 @@
 
     <script type="module">
         import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
         import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         initTheme();
 
         onAuthStateChanged(auth, async (user) => {
-            // ANTI-HACK DE CAMADA ADICIONAL SEPARADA
+            // ANTI-HACK DE CAMADA ADICIONAL SEPARADA COM TOLERÂNCIA ASSÍNCRONA
             if (!user || user.email !== ADMIN_EMAIL) {
-                window.location.href = "dashboard.html";
+                setTimeout(() => {
+                    if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+                        window.location.href = "dashboard.html";
+                    }
+                }, 500);
                 return;
             }
+            
+            document.getElementById("user-display-email").innerText = user.email;
             await loadProfiles();
         });
 
         async function loadProfiles() {
-            const querySnapshot = await getDocs(collection(db, "users_profiles"));
-            const tbody = document.getElementById("tbody-admin-users");
-            
-            let html = "";
-            querySnapshot.forEach((doc) => {
-                const u = doc.data();
-                if(u.email !== ADMIN_EMAIL) {
-                    html += `
-                    <tr class="text-slate-300">
-                        <td class="p-4 font-mono">${u.uid}</td>
-                        <td class="p-4 font-bold">${u.email}</td>
-                        <td class="p-4 text-center">
-                            <button onclick="impersonate('${u.uid}', '${u.email}')" class="bg-amber-500 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-amber-600 transition">Inspecionar Conta</button>
-                        </td>
-                    </tr>`;
-                }
-            });
-            tbody.innerHTML = html || `<tr><td colspan="3" class="p-4 text-center text-slate-500">Nenhum cliente cadastrado ainda.</td></tr>`;
+            try {
+                const querySnapshot = await getDocs(collection(db, "users_profiles"));
+                const tbody = document.getElementById("tbody-admin-users");
+                
+                let html = "";
+                querySnapshot.forEach((doc) => {
+                    const u = doc.data();
+                    if(u.email !== ADMIN_EMAIL) {
+                        html += `
+                        <tr class="hover:bg-slate-100/5 dark:hover:bg-slate-900/20 transition duration-150">
+                            <td class="p-4 font-mono text-slate-400 select-all">${u.uid}</td>
+                            <td class="p-4 font-bold text-slate-800 dark:text-slate-200">${u.email}</td>
+                            <td class="p-4 text-center">
+                                <button onclick="impersonate('${u.uid}', '${u.email}')" class="bg-amber-500 text-slate-950 font-bold px-4 py-1.5 rounded-xl text-xs hover:bg-amber-600 transition shadow-sm">Inspecionar Conta</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+                tbody.innerHTML = html || `<tr><td colspan="3" class="p-6 text-center text-slate-500 font-sans">Nenhum cliente cadastrado na base de dados ainda.</td></tr>`;
+            } catch (err) {
+                showToast("Erro ao carregar perfis corporativos.", "error");
+            }
         }
 
         window.impersonate = function(uid, email) {
@@ -91,6 +142,25 @@
             sessionStorage.setItem("impersonatedEmail", email);
             window.location.href = "dashboard.html";
         };
+
+        window.toggleTheme = function() {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        };
+
+        window.handleLogout = async function() {
+            await signOut(auth);
+        };
+
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
     </script>
 </body>
 </html>
