@@ -23,7 +23,7 @@
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -61,21 +61,21 @@
         <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full p-6 shadow-2xl text-slate-900 dark:text-slate-100 max-h-[90vh] flex flex-col">
             <div class="flex items-center gap-3 text-blue-500 mb-2">
                 <div class="p-3 bg-blue-500/10 rounded-full"><i class="fa-solid fa-file-import text-xl"></i></div>
-                <h3 class="text-lg font-bold">Auditoria Mestre de Código e Moeda</h3>
+                <h3 class="text-lg font-bold">Auditoria Mestre de Código e Moeda (Layout Imagem)</h3>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">O sistema sincronizou os códigos da sua planilha diretamente com as categorias do seu sistema. Itens não cadastrados serão destacados em vermelho.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">O robô processou as colunas da sua planilha. Os códigos foram validados diretamente com o seu plano de contas interno.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-xs font-semibold">
                 <div class="bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border dark:border-slate-800/40"><span class="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Lançamentos Detectados</span><span id="preview-total-linhas" class="text-lg font-black text-blue-500">0</span></div>
-                <div class="bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border dark:border-slate-800/40"><span class="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Soma de Receitas Detectadas</span><span id="preview-total-receitas" class="text-lg font-black text-emerald-500">R$ 0,00</span></div>
-                <div class="bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border dark:border-slate-800/40"><span class="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Soma de Despesas Detectadas</span><span id="preview-total-despesas" class="text-lg font-black text-rose-500">R$ 0,00</span></div>
+                <div class="bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border dark:border-slate-800/40"><span class="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Soma de Receitas (Entradas)</span><span id="preview-total-receitas" class="text-lg font-black text-emerald-500">R$ 0,00</span></div>
+                <div class="bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border dark:border-slate-800/40"><span class="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Soma de Despesas (Saídas)</span><span id="preview-total-despesas" class="text-lg font-black text-rose-500">R$ 0,00</span></div>
             </div>
 
-            <div class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">Amostra de Alinhamento com seu Plano de Contas Existente:</div>
+            <div class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">Amostra dos primeiros 5 registros estruturados:</div>
             <div class="flex-1 overflow-y-auto border border-slate-100 dark:border-slate-800/50 rounded-xl mb-4">
                 <table class="w-full text-left text-xs font-mono">
                     <thead class="bg-slate-100 dark:bg-slate-900 text-slate-400 border-b dark:border-slate-800 font-bold uppercase sticky top-0">
-                        <tr><th class="p-3">Data</th><th class="p-3">Tipo Sistema</th><th class="p-3">Código Identificado</th><th class="p-3">Categoria Cadastrada</th><th class="p-3">Banco/Conta</th><th class="p-3">Descrição (Planilha)</th><th class="p-3 text-right">Valor Tratado</th></tr>
+                        <tr><th class="p-3">Data</th><th class="p-3">Tipo Sistema</th><th class="p-3">Código</th><th class="p-3">Banco/Conta</th><th class="p-3">Descrição da Planilha</th><th class="p-3 text-right">Valor Tratado</th></tr>
                     </thead>
                     <tbody id="tbody-preview-amostra" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-slate-700 dark:text-slate-300"></tbody>
                 </table>
@@ -83,7 +83,7 @@
 
             <div class="flex justify-end gap-3 border-t border-slate-100 dark:border-slate-900 pt-4">
                 <button onclick="closeImportPreview()" type="button" class="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 transition-all">Rejeitar e Descartar</button>
-                <button onclick="confirmImport()" type="button" class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl text-sm font-bold shadow-md shadow-emerald-500/10 transition-all flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up"></i> Autorizar Lançamento</button>
+                <button onclick="confirmImport()" type="button" class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl text-sm font-bold shadow-md shadow-emerald-500/10 transition-all flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up"></i> Confirmar Lançamentos</button>
             </div>
         </div>
     </div>
@@ -143,8 +143,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div class="bg-white dark:bg-slate-950 p-4 border dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
                     <div class="flex flex-col space-y-1">
-                        <span class="text-slate-400 font-bold">Importação Automatizada via Template Oficial:</span>
-                        <span class="text-[10px] text-slate-500">Colunas A: Data | B: Código | C: Categoria | D: Banco/Conta | E: Descrição | F: Valor (BRL)</span>
+                        <span class="text-slate-400 font-bold">Importação Automatizada (Layout da Imagem):</span>
+                        <span class="text-[10px] text-slate-500">Colunas A: DATA | B: CÓDIGO | C: BANCO/CONTA | D: DESCRIÇÃO | E: VALOR</span>
                     </div>
                     <input type="file" id="excel-file-uploader" onchange="importExcel(event)" class="text-xs text-slate-400 cursor-pointer">
                 </div>
@@ -346,29 +346,6 @@
             if (currentPage > 1) { currentPage--; document.getElementById("master-checkbox").checked = false; renderTable(); }
         };
 
-        window.addTransaction = async function(e) {
-            e.preventDefault();
-            document.getElementById("sync-status").innerText = "Salvando...";
-            const id = Date.now().toString();
-            const txData = {
-                data: document.getElementById("input-tx-data").value,
-                tipo: document.getElementById("input-tx-tipo").value,
-                categoria: document.getElementById("input-tx-codigo").value,
-                banco: document.getElementById("input-tx-banco").value,
-                descricao: document.getElementById("input-tx-descricao").value,
-                valor: parseFloat(document.getElementById("input-tx-valor").value)
-            };
-            try {
-                await setDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id), txData);
-                state.transacoes.unshift({ id, ...txData });
-                document.getElementById("form-add-transacao").reset();
-                document.getElementById("sync-status").innerText = "Sincronizado";
-                showToast("Lançamento salvo!", "success");
-                populateFormDropdowns();
-                resetPageAndRender();
-            } catch (err) { showToast("Erro ao salvar.", "error"); }
-        };
-
         window.toggleRowCheckbox = function(el, id) {
             if (el.checked) selectedIds.add(id); else selectedIds.delete(id);
             toggleBulkActionBar();
@@ -440,9 +417,9 @@
             resetPageAndRender();
         };
 
-        // =======================================================
-        // ROBÔ DE PARSE COM VERIFICAÇÃO DE CÓDIGOS JÁ CADASTRADOS
-        // =======================================================
+        // =================================================================
+        // ROBÔ ATUALIZADO CONFORME AS COLUNAS DA SUA IMAGEM (COLUNAS A-E)
+        // =================================================================
         window.importExcel = function(e) {
             const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -469,38 +446,21 @@
                         const row = rows[i];
                         if (!row || row.length < 2) continue;
 
-                        // LEITURA DO SEU MODELO DE TEMPLATE
-                        let rawData = row[0];                             // Coluna A: Data
-                        let rawCodigo = String(row[1] || "").trim();      // Coluna B: Código Único
-                        let rawBanco = String(row[3] || "001").trim();    // Coluna D: Banco/Conta
-                        let rawDescricao = String(row[4] || "Lote").trim();   // Coluna E: Descrição
-                        let cleanValor = String(row[5] || "0");           // Coluna F: Valor (BRL)
+                        // MAPEAMENTO STRICT CORRESPONDENTE À SUA IMAGEM:
+                        let rawData = row[0];                             // Coluna A: DATA
+                        let rawCodigo = String(row[1] !== undefined && row[1] !== null ? row[1] : "").trim(); // Coluna B: CÓDIGO
+                        let rawBanco = String(row[2] || "001").trim();    // Coluna C: BANCO/CONTA
+                        let rawDescricao = String(row[3] || "Lote").trim();   // Coluna D: DESCRIÇÃO
+                        let cleanValor = String(row[4] || "0");           // Coluna E: VALOR
 
-                        if (!rawCodigo) continue;
-
-                        // PROCURA A CONFIGURAÇÃO MESTRE CADASTRADA NO SISTEMA (NOME E TIPO REAL)
-                        const catSistema = state.categorias.find(c => c.codigo === rawCodigo);
-                        
-                        let tipoDetected = "receita";
-                        let nomeCategoria = "<span class='text-rose-500 font-bold'>CÓDIGO INEXISTENTE</span>";
-                        
-                        if (catSistema) {
-                            tipoDetected = catSistema.tipo; // Puxa o tipo real cadastrado no sistema
-                            nomeCategoria = catSistema.nome; // Puxa o nome real cadastrado no sistema
-                        } else {
-                            // Fallback visual caso venha um código bizarro na planilha
-                            if (rawCodigo.startsWith('2') || rawCodigo.startsWith('3') || cleanValor.includes("-")) {
-                                tipoDetected = "despesa";
-                            }
-                        }
-
-                        // LIMPADOR E CONVERSOR DE MOEDA REAL BRASILEIRA (BRL)
+                        // ENGENHARIA DE LIMPEZA MONETÁRIA BRASILEIRA (BRL)
                         cleanValor = cleanValor.replace(/R\$\s?/g, "").replace(/\./g, "").trim(); 
+                        let isNegative = cleanValor.includes("-");
                         cleanValor = cleanValor.replace(/-/g, "").replace(",", "."); 
                         let rawValor = parseFloat(cleanValor);
                         if (isNaN(rawValor)) rawValor = 0;
 
-                        // Padronizador de Data do Excel
+                        // Conversor de Datas Nativas do motor Excel
                         let dataFormatada = "";
                         if (!isNaN(rawData) && Number(rawData) > 40000) {
                             const dateObj = new Date((Number(rawData) - 25569) * 86400 * 1000);
@@ -511,6 +471,19 @@
                                 const parts = strDate.split('/');
                                 dataFormatada = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
                             } else { dataFormatada = strDate; }
+                        }
+
+                        // CRUZAMENTO ASSÍNCRONO COM SEU PLANO DE CONTAS JÁ CADASTRADO
+                        const catSistema = state.categorias.find(c => c.codigo === rawCodigo);
+                        let tipoDetected = "receita";
+                        
+                        if (catSistema) {
+                            tipoDetected = catSistema.tipo; // Usa o tipo real do seu plano de contas
+                        } else {
+                            // Se o código for zero ou não mapeado, tenta classificar pelo sinal numérico
+                            if (rawCodigo.startsWith('2') || rawCodigo.startsWith('3') || isNegative) {
+                                tipoDetected = "despesa";
+                            }
                         }
 
                         if (tipoDetected === "receita") somaReceitas += rawValor;
@@ -525,15 +498,14 @@
                             valor: rawValor
                         });
 
-                        // Renderiza na tabela de auditoria as primeiras 5 linhas
+                        // Renderiza a amostragem contábil (Primeiras 5 Linhas)
                         if (tempImportData.length <= 5) {
                             amostraHtml += `
                             <tr class="border-b border-slate-100 dark:border-slate-900/60 bg-slate-50/50 dark:bg-slate-900/10">
                                 <td class="p-3">${dataFormatada.split('-').reverse().join('/')}</td>
                                 <td class="p-3 font-bold uppercase text-[10px] ${tipoDetected==='receita'?'text-emerald-500':'text-rose-500'}">${tipoDetected}</td>
-                                <td class="p-3 font-mono text-blue-500 font-bold">${rawCodigo}</td>
-                                <td class="p-3 text-slate-700 dark:text-slate-300 font-semibold">${nomeCategoria}</td>
-                                <td class="p-3 font-medium">${rawBanco}</td>
+                                <td class="p-3 font-mono text-emerald-500 font-bold">${rawCodigo}</td>
+                                <td class="p-3 font-semibold">${rawBanco}</td>
                                 <td class="p-3 text-slate-400 max-w-xs truncate">${rawDescricao}</td>
                                 <td class="p-3 text-right font-bold text-slate-900 dark:text-slate-100">R$ ${rawValor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
                             </tr>`;
@@ -549,7 +521,7 @@
                     previewModal.classList.remove("hidden"); previewModal.classList.add("flex");
                     document.getElementById("sync-status").innerText = "Aguardando aprovação...";
                 } catch (err) {
-                    showToast("Falha crítica ao ler o arquivo Excel.", "error");
+                    showToast("Formato de planilha incompatível.", "error");
                     document.getElementById("sync-status").innerText = "Sincronizado";
                 }
             };
@@ -572,14 +544,10 @@
                 let batch = writeBatch(db); let counter = 0; let totalImported = 0;
 
                 for (const t of tempImportData) {
-                    // Adiciona novas contas bancárias caso não estejam salvas no plano mestre
                     if (!state.bancos.some(b => b.codigo === t.banco)) {
-                        state.bancos.push({ codigo: t.banco, nome: "Conta " + t.banco });
+                        state.bancos.push({ codigo: t.banco, nome: t.banco });
                         tempWorkspaceUpdated = true;
                     }
-
-                    // A criação automática de categorias foi removida! O robô rejeita/ignora dados fantasmas 
-                    // para preservar as categorias fixas e estruturadas que você já cadastrou.
 
                     const txId = (Date.now() + totalImported + Math.random()).toString().replace('.', '');
                     batch.set(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", txId), t);
@@ -597,7 +565,7 @@
                     await setDoc(doc(db, "users", targetUid, "workspaces", workspace), { bancos: state.bancos }, { merge: true });
                 }
                 state.transacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
-                showToast(`Sucesso! ${totalImported} registros gravados.`, "success");
+                showToast(`Sucesso! ${totalImported} registros sincronizados na nuvem.`, "success");
             } catch (err) { showToast("Erro ao gravar lote.", "error"); }
 
             tempImportData = []; document.getElementById("excel-file-uploader").value = "";
