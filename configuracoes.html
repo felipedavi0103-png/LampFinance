@@ -85,7 +85,16 @@
                     <input type="text" id="input-bc-nome" required placeholder="Nome do Banco" class="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 rounded-xl font-bold text-white transition-colors">Criar</button>
                 </form>
-                <ul id="ul-bancos" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs max-h-64 overflow-y-auto space-y-1 pt-2"></ul>
+                
+                <div class="flex justify-between items-center text-[11px] text-slate-400 px-1 pt-1 border-t dark:border-slate-900">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="master-bc-checkbox" onclick="toggleAllBancos(this)" class="rounded bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800">
+                        <span>Selecionar Todas as Contas</span>
+                    </label>
+                    <button onclick="bulkDeleteBancos()" id="btn-bulk-delete-bancos" type="button" class="hidden text-rose-500 hover:text-rose-400 font-bold items-center gap-1"><i class="fa-solid fa-trash-can"></i> Excluir Selecionadas</button>
+                </div>
+
+                <ul id="ul-bancos" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs max-h-64 overflow-y-auto space-y-1"></ul>
             </div>
 
             <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm space-y-4">
@@ -99,7 +108,16 @@
                     <input type="text" id="input-cat-nome" required placeholder="Nome" class="col-span-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:border-purple-500">
                     <button type="submit" class="col-span-4 bg-purple-600 hover:bg-purple-700 py-2.5 rounded-xl font-bold text-white transition-colors">Criar Nova Categoria</button>
                 </form>
-                <ul id="ul-categorias" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs max-h-64 overflow-y-auto space-y-1 pt-2"></ul>
+
+                <div class="flex justify-between items-center text-[11px] text-slate-400 px-1 pt-1 border-t dark:border-slate-900">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="master-cat-checkbox" onclick="toggleAllCategorias(this)" class="rounded bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800">
+                        <span>Selecionar Todas as Categorias</span>
+                    </label>
+                    <button onclick="bulkDeleteCategorias()" id="btn-bulk-delete-categorias" type="button" class="hidden text-rose-500 hover:text-rose-400 font-bold items-center gap-1"><i class="fa-solid fa-trash-can"></i> Excluir Selecionadas</button>
+                </div>
+
+                <ul id="ul-categorias" class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs max-h-64 overflow-y-auto space-y-1"></ul>
             </div>
 
             <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm space-y-4 lg:col-span-2">
@@ -124,18 +142,14 @@
         let state = { bancos: [], categorias: [] };
         let targetUid = ""; let workspace = "";
 
-        // MONITOR E REDIRECIONADOR COESO DE SESSÃO
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                setTimeout(() => {
-                    if (!auth.currentUser) window.location.href = "index.html";
-                }, 500);
+                setTimeout(() => { if (!auth.currentUser) window.location.href = "index.html"; }, 500);
                 return;
             }
             
             document.getElementById("user-display-email").innerText = user.email;
 
-            // Validação e persistência ativa do Modo Suporte Admin corporativo
             const impUid = sessionStorage.getItem("impersonatedUid");
             const impEmail = sessionStorage.getItem("impersonatedEmail");
             if (impUid && user.email === ADMIN_EMAIL) {
@@ -152,7 +166,6 @@
             await loadData();
         });
 
-        // Carrega metadados (Bancos e Categorias) salvos no documento mestre do Workspace
         async function loadData() {
             try {
                 const docSnap = await getDoc(doc(db, "users", targetUid, "workspaces", workspace));
@@ -160,19 +173,24 @@
                     const data = docSnap.data();
                     state.bancos = data.bancos || [];
                     state.categorias = data.categorias || [];
+                    
+                    // Reset dos seletores de cabeçalho
+                    document.getElementById("master-bc-checkbox").checked = false;
+                    document.getElementById("master-cat-checkbox").checked = false;
+                    
                     renderLists(); 
                 }
-            } catch (err) {
-                console.error("Erro na leitura de metadados:", err);
-            }
+            } catch (err) { console.error("Erro na leitura de metadados:", err); }
         }
 
-        // CONVERSOR GRÁFICO DINÂMICO DE ESTRUTURAS COM SUPORTE A EDIÇÃO E EXCLUSÃO
         function renderLists() {
-            // Renderiza Contas Bancárias
+            // Renderiza Contas Bancárias com Checkboxes de lote
             document.getElementById("ul-bancos").innerHTML = state.bancos.map(b => `
                 <li class="py-2.5 px-3 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl transition-all duration-200">
-                    <span class="font-medium">Cód: <strong class="font-mono text-blue-500 font-bold">${b.codigo}</strong> - <span class="text-slate-700 dark:text-slate-300 font-semibold">${b.nome}</span></span>
+                    <div class="flex items-center gap-2.5">
+                        <input type="checkbox" data-codigo="${b.codigo}" class="bc-row-checkbox cursor-pointer rounded bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800" onclick="updateBancosBulkUI()">
+                        <span class="font-medium">Cód: <strong class="font-mono text-blue-500 font-bold">${b.codigo}</strong> - <span class="text-slate-700 dark:text-slate-300 font-semibold">${b.nome}</span></span>
+                    </div>
                     <div class="flex items-center gap-1">
                         <button onclick="editBanco('${b.codigo}')" type="button" class="text-slate-400 hover:text-blue-500 p-1.5 transition-colors" title="Editar Nome"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button onclick="deleteBanco('${b.codigo}')" type="button" class="text-slate-400 hover:text-rose-500 p-1.5 transition-colors" title="Excluir"><i class="fa-solid fa-trash-can"></i></button>
@@ -180,10 +198,13 @@
                 </li>
             `).join('');
 
-            // Renderiza Categorias Gerenciais
+            // Renderiza Categorias com Checkboxes de lote
             document.getElementById("ul-categorias").innerHTML = state.categorias.map(c => `
                 <li class="py-2.5 px-3 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl transition-all duration-200">
-                    <span class="font-medium">Cód: <strong class="font-mono text-purple-500 font-bold">${c.codigo}</strong> - <span class="text-slate-700 dark:text-slate-300 font-semibold">${c.nome}</span></span>
+                    <div class="flex items-center gap-2.5">
+                        <input type="checkbox" data-codigo="${c.codigo}" class="cat-row-checkbox cursor-pointer rounded bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800" onclick="updateCategoriasBulkUI()">
+                        <span class="font-medium">Cód: <strong class="font-mono text-purple-500 font-bold">${c.codigo}</strong> - <span class="text-slate-700 dark:text-slate-300 font-semibold">${c.nome}</span></span>
+                    </div>
                     <div class="flex items-center gap-3">
                         <span class="uppercase font-extrabold text-[9px] px-1.5 py-0.5 rounded tracking-wider ${c.tipo==='receita'?'bg-emerald-500/10 text-emerald-500':'bg-rose-500/10 text-rose-500'}">${c.tipo}</span>
                         <div class="flex items-center gap-1">
@@ -193,28 +214,98 @@
                     </div>
                 </li>
             `).join('');
+            
+            updateBancosBulkUI();
+            updateCategoriasBulkUI();
         }
 
-        // OPERAÇÕES DO MOTOR CRUD INTERNO DE METADADOS
+        // ==========================================
+        // ENGENHARIA DE SELEÇÃO E EXCLUSÃO EM LOTE (CONTAS)
+        // ==========================================
+        window.toggleAllBancos = function(master) {
+            document.querySelectorAll(".bc-row-checkbox").forEach(cb => cb.checked = master.checked);
+            updateBancosBulkUI();
+        };
+
+        window.updateBancosBulkUI = function() {
+            const count = document.querySelectorAll(".bc-row-checkbox:checked").length;
+            const btn = document.getElementById("btn-bulk-delete-bancos");
+            if (count > 0) {
+                btn.innerHTML = `<i class="fa-solid fa-trash-can"></i> Excluir Selecionadas (${count})`;
+                btn.classList.remove("hidden");
+                btn.classList.add("flex");
+            } else {
+                btn.classList.add("hidden");
+                btn.classList.remove("flex");
+                document.getElementById("master-bc-checkbox").checked = false;
+            }
+        };
+
+        window.bulkDeleteBancos = async function() {
+            const checkboxes = document.querySelectorAll(".bc-row-checkbox:checked");
+            const codigosParaDeletar = Array.from(checkboxes).map(cb => String(cb.dataset.codigo).trim());
+            
+            if (confirm(`Tem certeza que deseja remover as ${codigosParaDeletar.length} contas bancárias selecionadas?`)) {
+                state.bancos = state.bancos.filter(b => !codigosParaDeletar.includes(String(b.codigo).trim()));
+                await save();
+                renderLists();
+                showToast("Contas bancárias excluídas em lote!", "success");
+            }
+        };
+
+        // ==========================================
+        // ENGENHARIA DE SELEÇÃO E EXCLUSÃO EM LOTE (CATEGORIAS)
+        // ==========================================
+        window.toggleAllCategorias = function(master) {
+            document.querySelectorAll(".cat-row-checkbox").forEach(cb => cb.checked = master.checked);
+            updateCategoriasBulkUI();
+        };
+
+        window.updateCategoriasBulkUI = function() {
+            const count = document.querySelectorAll(".cat-row-checkbox:checked").length;
+            const btn = document.getElementById("btn-bulk-delete-categorias");
+            if (count > 0) {
+                btn.innerHTML = `<i class="fa-solid fa-trash-can"></i> Excluir Selecionadas (${count})`;
+                btn.classList.remove("hidden");
+                btn.classList.add("flex");
+            } else {
+                btn.classList.add("hidden");
+                btn.classList.remove("flex");
+                document.getElementById("master-cat-checkbox").checked = false;
+            }
+        };
+
+        window.bulkDeleteCategorias = async function() {
+            const checkboxes = document.querySelectorAll(".cat-row-checkbox:checked");
+            const codigosParaDeletar = Array.from(checkboxes).map(cb => String(cb.dataset.codigo).trim());
+            
+            if (confirm(`Tem certeza que deseja remover as ${codigosParaDeletar.length} categorias selecionadas?`)) {
+                state.categorias = state.categorias.filter(c => !codigosParaDeletar.includes(String(c.codigo).trim()));
+                await save();
+                renderLists();
+                showToast("Categorias operacionais removidas!", "success");
+            }
+        };
+
+        // OPERAÇÕES CRUD INDIVIDUAIS
         window.deleteBanco = async function(codigo) {
             if (confirm("Deseja realmente remover esta conta bancária do seu Plano de Contas?")) {
                 state.bancos = state.bancos.filter(b => b.codigo !== codigo);
                 await save();
                 renderLists();
-                showToast("Conta bancária removida com sucesso!", "success");
+                showToast("Conta bancária removida!", "success");
             }
         };
 
         window.editBanco = async function(codigo) {
             const banco = state.bancos.find(b => b.codigo === codigo);
             if (!banco) return;
-            
             const novoNome = prompt("Insira a nova identificação para a Conta Bancária:", banco.nome);
             if (novoNome && novoNome.trim() !== "") {
                 banco.nome = novoNome.trim();
                 await save();
                 renderLists();
-                showToast("Nome do banco atualizado com sucesso!", "success");
+                showToast("Nome do banco atualizado!", "success");
             }
         };
 
@@ -223,20 +314,19 @@
                 state.categorias = state.categorias.filter(c => c.codigo !== codigo);
                 await save();
                 renderLists();
-                showToast("Categoria gerencial removida com sucesso!", "success");
+                showToast("Categoria gerencial removida!", "success");
             }
         };
 
         window.editCategoria = async function(codigo) {
             const categoria = state.categorias.find(c => c.codigo === codigo);
             if (!categoria) return;
-
             const novoNome = prompt("Insira a nova identificação para a Categoria:", categoria.nome);
             if (novoNome && novoNome.trim() !== "") {
                 categoria.nome = novoNome.trim();
                 await save();
                 renderLists();
-                showToast("Categoria gerencial atualizada com sucesso!", "success");
+                showToast("Categoria gerencial atualizada!", "success");
             }
         };
 
@@ -244,17 +334,11 @@
             e.preventDefault();
             const codigo = document.getElementById("input-bc-codigo").value.trim();
             const nome = document.getElementById("input-bc-nome").value.trim();
-
-            if (state.bancos.some(b => b.codigo === codigo)) {
-                showToast("Este código de conta já existe!", "error");
-                return;
-            }
-
+            if (state.bancos.some(b => String(b.codigo).trim() === codigo)) { showToast("Este código de conta já existe!", "error"); return; }
             state.bancos.push({ codigo, nome });
             document.getElementById("input-bc-codigo").value = "";
             document.getElementById("input-bc-nome").value = "";
-            await save(); 
-            renderLists();
+            await save(); renderLists();
             showToast("Nova conta bancária registrada!", "success");
         };
 
@@ -263,38 +347,26 @@
             const codigo = document.getElementById("input-cat-codigo").value.trim();
             const nome = document.getElementById("input-cat-nome").value.trim();
             const tipo = document.getElementById("input-cat-tipo").value;
-
-            if (state.categorias.some(c => c.codigo === codigo)) {
-                showToast("Este código de categoria já existe!", "error");
-                return;
-            }
-
+            if (state.categorias.some(c => String(c.codigo).trim() === codigo)) { showToast("Este código de categoria já existe!", "error"); return; }
             state.categorias.push({ codigo, tipo, nome });
             document.getElementById("input-cat-codigo").value = "";
             document.getElementById("input-cat-nome").value = "";
-            await save(); 
-            renderLists();
-            showToast("Nova categoria estruturada com sucesso!", "success");
+            await save(); renderLists();
+            showToast("Nova categoria estruturada!", "success");
         };
 
         window.changeUserPassword = async function(e) {
             e.preventDefault();
             const pass = document.getElementById("input-new-password").value;
-            if(pass !== document.getElementById("input-confirm-new-password").value) { 
-                showToast("As senhas não coincidem!", "error"); 
-                return; 
-            }
+            if(pass !== document.getElementById("input-confirm-new-password").value) { showToast("As senhas não coincidem!", "error"); return; }
             try {
                 await updatePassword(auth.currentUser, pass);
                 showToast("Sua senha foi alterada com sucesso!", "success");
                 document.getElementById("input-new-password").value = "";
                 document.getElementById("input-confirm-new-password").value = "";
-            } catch(e) { 
-                showToast("Sessão de segurança expirada. Realize login novamente.", "error"); 
-            }
+            } catch(e) { showToast("Sessão expirada. Realize login novamente.", "error"); }
         };
 
-        // Salva as alterações mesclando os dados sem apagar coleções vizinhas
         async function save() {
             document.getElementById("sync-status").innerText = "Salvando...";
             try {
@@ -303,35 +375,12 @@
                     categorias: state.categorias
                 }, { merge: true });
                 document.getElementById("sync-status").innerText = "Sincronizado";
-            } catch(err) {
-                showToast("Falha no salvamento: " + err.message, "error");
-            }
+            } catch(err) { showToast("Falha no salvamento: " + err.message, "error"); }
         }
 
-        window.toggleTheme = function() {
-            const isDark = document.documentElement.classList.toggle("dark");
-            localStorage.setItem("theme", isDark ? "dark" : "light");
-        };
-
-        window.exitImpersonation = function() {
-            sessionStorage.removeItem("impersonatedUid");
-            sessionStorage.removeItem("impersonatedEmail");
-            window.location.href = "admin.html";
-        };
-
-        window.handleLogout = async function() {
-            await signOut(auth);
-        };
-
-        function showToast(message, type = "success") {
-            const container = document.getElementById("toast-container");
-            const toast = document.createElement("div");
-            const bg = type === "success" ? "bg-emerald-500 text-slate-950" : "bg-rose-500 text-white";
-            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300 pointer-events-auto`;
-            toast.innerHTML = `<span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
-        }
+        window.toggleTheme = function() { const isDark = document.documentElement.classList.toggle("dark"); localStorage.setItem("theme", isDark ? "dark" : "light"); };
+        window.exitImpersonation = function() { sessionStorage.removeItem("impersonatedUid"); sessionStorage.removeItem("impersonatedEmail"); window.location.href = "admin.html"; };
+        window.handleLogout = async function() { await signOut(auth); };
     </script>
 </body>
 </html>
