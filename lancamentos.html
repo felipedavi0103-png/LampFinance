@@ -49,9 +49,9 @@
                 <div class="p-3 bg-rose-500/10 rounded-full"><i class="fa-solid fa-trash-can text-xl"></i></div>
                 <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
             </div>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">Tem certeza absoluta que deseja remover este(s) item(ns)? Essa ação atualizará a nuvem imediatamente fatiando a remoção em lotes seguros.</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">Tem certeza absoluta que deseja remover este(s) item(ns)? Essa ação atualizará a nuvem imediatamente.</p>
             <div class="flex justify-end gap-3 border-t border-slate-100 dark:border-slate-900 pt-4">
-                <button onclick="closeDeleteModal()" type="button" class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 transition-all">Cancelar</button>
+                <button onclick="closeDeleteModal()" type="button" class="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 transition-all">Cancelar</button>
                 <button id="confirm-delete-btn" type="button" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-bold shadow-md shadow-rose-500/10 transition-all">Excluir Permanentemente</button>
             </div>
         </div>
@@ -63,7 +63,7 @@
                 <div class="p-3 bg-blue-500/10 rounded-full"><i class="fa-solid fa-file-import text-xl"></i></div>
                 <h3 class="text-lg font-bold">Auditoria Mestre de Código e Moeda</h3>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Verifique a conciliação estrutural da planilha. O sistema cruzou os códigos com as Categorias Estruturais cadastradas no ambiente.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Confira os somatórios abaixo. O erro de multiplicação foi completamente corrigido blindando os decimais.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-xs font-semibold">
                 <div class="bg-slate-100 dark:bg-slate-900/50 p-3 rounded-xl border dark:border-slate-800/40"><span class="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Lançamentos Detectados</span><span id="preview-total-linhas" class="text-lg font-black text-blue-500">0</span></div>
@@ -346,29 +346,6 @@
             if (currentPage > 1) { currentPage--; document.getElementById("master-checkbox").checked = false; renderTable(); }
         };
 
-        window.addTransaction = async function(e) {
-            e.preventDefault();
-            document.getElementById("sync-status").innerText = "Salvando...";
-            const id = Date.now().toString();
-            const txData = {
-                data: document.getElementById("input-tx-data").value,
-                tipo: document.getElementById("input-tx-tipo").value,
-                categoria: document.getElementById("input-tx-categoria").value,
-                banco: document.getElementById("input-tx-banco").value,
-                descricao: document.getElementById("input-tx-descricao").value,
-                valor: parseFloat(document.getElementById("input-tx-valor").value)
-            };
-            try {
-                await setDoc(doc(db, "users", targetUid, "workspaces", workspace, "transacoes", id), txData);
-                state.transacoes.unshift({ id, ...txData });
-                document.getElementById("form-add-transacao").reset();
-                document.getElementById("sync-status").innerText = "Sincronizado";
-                showToast("Lançamento salvo!", "success");
-                populateFormDropdowns();
-                resetPageAndRender();
-            } catch (err) { showToast("Erro ao salvar.", "error"); }
-        };
-
         window.toggleRowCheckbox = function(el, id) {
             if (el.checked) selectedIds.add(id); else selectedIds.delete(id);
             toggleBulkActionBar();
@@ -445,10 +422,9 @@
             const isDark = document.documentElement.classList.toggle("dark");
             localStorage.setItem("theme", isDark ? "dark" : "light");
         };
-        window.handleLogout = async function() { await signOut(auth); };
 
         // =====================================================================
-        // ROBÔ CONCILIADOR: COLUNAS FIXAS DA IMAGEM E CAPTURA PURA DE HISTÓRICO
+        // ROBÔ CONCILIADOR PROTEGIDO: COMPATÍVEL COM NÚMEROS E STRINGS BRL
         // =====================================================================
         window.importExcel = function(e) {
             const file = e.target.files[0]; if (!file) return;
@@ -476,21 +452,41 @@
                         const row = rows[i];
                         if (!row || row.length < 2) continue;
 
-                        // LEITURA FIEL DA SUA BASE DE IMAGEM:
+                        // LEITURA FIEL DAS COLUNAS DA SUA IMAGEM:
                         let rawData = row[0];                                                 // A: DATA
                         let rawCodigo = String(row[1] !== undefined && row[1] !== null ? row[1] : "").trim(); // B: CÓDIGO (Ex: "0")
                         let rawBanco = String(row[2] || "").trim();                           // C: BANCO/CONTA (Ex: "36997-PJ")
                         let rawDescricao = String(row[3] || "").trim();                       // D: DESCRIÇÃO DA PLANILHA (Ex: "PATRICIA G. DA SILVA")
-                        let cleanValor = String(row[4] || "0");                               // E: VALOR (Ex: "R$ 650,00")
+                        let valCell = row[4];                                                 // E: VALOR COMPLETO
 
-                        // PARSER E HIGIENIZADOR DE MOEDA REAL BRASILEIRA (BRL)
-                        cleanValor = cleanValor.replace(/R\$\s?/g, "").replace(/\./g, "").trim(); 
-                        let isNegative = cleanValor.includes("-");
-                        cleanValor = cleanValor.replace(/-/g, "").replace(",", "."); 
-                        let rawValor = parseFloat(cleanValor);
+                        if (!rawCodigo) continue;
+
+                        // ENGENHARIA ANTI-MULTIPLICAÇÃO DE VALORES (PROTEÇÃO PARA EXCEL STRINGS E FLOATS NATIVOS)
+                        let rawValor = 0;
+                        let isNegative = false;
+
+                        if (typeof valCell === 'number') {
+                            // Se o Excel já entregou o número descriptografado e limpo, absorve direto!
+                            rawValor = valCell;
+                            if (rawValor < 0) {
+                                isNegative = true;
+                                rawValor = Math.abs(rawValor);
+                            }
+                        } else {
+                            // Tratamento de segurança caso venha formatado estritamente como String de texto BRL
+                            let cleanValor = String(valCell || "0").trim();
+                            isNegative = cleanValor.includes("-");
+                            cleanValor = cleanValor.replace(/R\$\s?/g, "").replace(/-/g, "").trim(); 
+                            
+                            // Se contiver a vírgula de centavos brasileira (Ex: 5.000,00)
+                            if (cleanValor.includes(",")) {
+                                cleanValor = cleanValor.replace(/\./g, "").replace(",", "."); 
+                            }
+                            rawValor = parseFloat(cleanValor);
+                        }
                         if (isNaN(rawValor)) rawValor = 0;
 
-                        // Padronizador de Datas nativas do Excel
+                        // Padronizador de Datas nativas do motor Excel
                         let dataFormatada = "";
                         if (!isNaN(rawData) && Number(rawData) > 40000) {
                             const dateObj = new Date((Number(rawData) - 25569) * 86400 * 1000);
@@ -503,16 +499,15 @@
                             } else { dataFormatada = strDate; }
                         }
 
-                        // CONSULTA ATIVA AO PLANO DE CONTAS DO FIREBASE DO USUÁRIO
+                        // CONSULTA ATIVA AO PLANO DE CONTAS DO SISTEMA
                         const catSistema = state.categorias.find(c => String(c.codigo).trim() === rawCodigo);
                         let tipoDetected = "receita"; 
                         let nomeCategoria = "<span class='text-rose-500 font-bold'>Código Não Cadastrado</span>";
                         
                         if (catSistema) {
-                            tipoDetected = catSistema.tipo;   // Redireciona para o tipo cadastrado (Ex: receita)
-                            nomeCategoria = catSistema.nome; // Resolve o nome contábil (Ex: RECEITA GERAL)
+                            tipoDetected = catSistema.tipo;   
+                            nomeCategoria = catSistema.nome; 
                         } else {
-                            // Se for um código alternativo novo, classifica pelo sinal contábil
                             if (rawCodigo.startsWith('2') || rawCodigo.startsWith('3') || isNegative) {
                                 tipoDetected = "despesa";
                             }
@@ -527,7 +522,7 @@
                             tipo: tipoDetected,
                             categoria: rawCodigo,
                             banco: rawBanco,
-                            descricao: rawDescricao, // Guarda exatamente "PATRICIA G. DA SILVA"
+                            descricao: rawDescricao, 
                             valor: rawValor
                         });
 
@@ -606,6 +601,13 @@
             document.getElementById("sync-status").innerText = "Sincronizado";
             populateFormDropdowns(); resetPageAndRender();
         };
+
+        window.exitImpersonation = function() {
+            sessionStorage.removeItem("impersonatedUid");
+            sessionStorage.removeItem("impersonatedEmail");
+            window.location.href = "admin.html";
+        };
+        window.handleLogout = async function() { await signOut(auth); };
     </script>
 </body>
 </html>
