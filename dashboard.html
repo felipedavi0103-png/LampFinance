@@ -8,7 +8,13 @@
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { brand: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' } } } }
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+                    }
+                }
+            }
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,54 +24,62 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        .dark ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; border: 1px solid #334155; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased overflow-x-hidden select-none">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex transition-colors duration-300 antialiased select-none">
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-    <div id="support-banner" class="hidden fixed top-0 left-0 right-0 bg-amber-500 text-slate-950 font-semibold px-4 py-2.5 text-center text-sm shadow-md z-50 flex items-center justify-center gap-3 transition-all duration-300">
-        <span><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> <strong>MODO SUPORTE ATIVO:</strong> Editando conta de <span id="support-user-email" class="underline font-bold"></span>.</span>
+    <div id="support-banner" class="hidden bg-amber-500 text-slate-950 font-semibold px-4 py-2.5 text-center text-sm shadow-md fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 transition-all duration-300">
+        <span><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> <strong>MODO SUPORTE ATIVO:</strong> Você está editando a conta de <span id="support-user-email" class="underline font-bold"></span>.</span>
         <button onclick="exitImpersonation()" class="bg-slate-950 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-slate-800 transition">Sair</button>
     </div>
 
-    <aside id="sidebar" class="sticky top-0 flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/80 flex flex-col justify-between h-screen z-40">
+    <aside id="sidebar" class="sticky top-0 flex w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between h-screen z-40">
         <div class="p-5 space-y-6 overflow-y-auto flex-1 overflow-x-hidden">
-            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-2">
-                <i class="fa-solid fa-lightbulb text-amber-500"></i>
-                <span>Lamp<span class="text-emerald-500">Finance</span></span>
+            <div class="flex items-center gap-2.5 text-xl font-bold px-1 pt-4">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i><span>Lamp<span class="text-emerald-500">Finance</span></span>
             </div>
             <nav class="space-y-1">
                 <a href="dashboard.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-emerald-600 bg-emerald-500/10 dark:bg-emerald-500/5 transition-all"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
                 <a href="lancamentos.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-receipt w-5"></i> Lançamentos</a>
                 <a href="resumo.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-table-cells w-5"></i> Resumo por Mês</a>
+                <a href="configuracoes.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-sliders w-5"></i> Configurações</a>
+                <a id="menu-dre-btn" href="dre.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"><i class="fa-solid fa-file-invoice-dollar w-5"></i> DRE Dinâmico</a>
+                <a id="admin-panel-btn" href="admin.html" class="hidden w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-amber-500 border border-dashed border-amber-500/30 hover:bg-amber-500/10 transition-all"><i class="fa-solid fa-shield-halved w-5"></i> Painel Admin</a>
             </nav>
+        </div>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+            <span id="sync-status">Sincronizado</span>
+            <button onclick="handleLogout()" class="hover:text-rose-500 transition flex items-center gap-1"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
         </div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
-        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center">
-            <h2 class="text-base font-bold text-slate-800 dark:text-slate-200">Dashboard Geral</h2>
-            <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:text-emerald-500"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+        <header class="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-8 flex justify-between items-center z-20">
+            <h2 class="text-lg font-bold">Dashboard Executivo</h2>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:text-emerald-500 transition-all"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+                <span id="user-display-email" class="text-xs font-medium text-slate-400">Carregando...</span>
+            </div>
         </header>
 
-        <main class="p-8 space-y-6 flex-1 overflow-y-auto">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-5">
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-800/60 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Receitas</div><div id="kpi-receitas" class="text-2xl font-black text-emerald-500">R$ 0,00</div></div>
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-800/60 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Despesas</div><div id="kpi-despesas" class="text-2xl font-black text-rose-500">R$ 0,00</div></div>
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-800/60 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Saldo</div><div id="kpi-resultado" class="text-2xl font-black">R$ 0,00</div></div>
-                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-800/60 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Margem</div><div id="kpi-margem" class="text-2xl font-black text-indigo-500">0%</div></div>
+        <main class="p-8 space-y-6 mt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Receitas Totais</div><div id="kpi-receitas" class="text-2xl font-black text-emerald-500">R$ 0,00</div></div>
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Despesas Totais</div><div id="kpi-despesas" class="text-2xl font-black text-rose-500">R$ 0,00</div></div>
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Saldo Operacional</div><div id="kpi-resultado" class="text-2xl font-black">R$ 0,00</div></div>
+                <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border dark:border-slate-800 shadow-sm"><div class="text-[10px] font-bold uppercase text-slate-500">Margem de Lucro</div><div id="kpi-margem" class="text-2xl font-black text-indigo-500">0%</div></div>
             </div>
 
             <div class="grid grid-cols-1 gap-6">
-                <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-800/60 shadow-sm h-80">
+                <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border dark:border-slate-800 h-80">
                     <h4 class="text-[10px] font-bold uppercase text-slate-500 mb-4">Distribuição de Despesas</h4>
                     <div class="h-64 flex justify-center"><canvas id="canvas-chart-categorias"></canvas></div>
                 </div>
-
-                <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-800/60 shadow-sm h-[480px]">
+                <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border dark:border-slate-800 h-[480px]">
                     <h4 class="text-[10px] font-bold uppercase text-slate-500 mb-4">Fluxo Mensal de Caixa (Histórico Completo)</h4>
                     <div class="h-[400px]"><canvas id="canvas-chart-global"></canvas></div>
                 </div>
@@ -75,7 +89,7 @@
 
     <script type="module">
         import { auth, db, ADMIN_EMAIL, initTheme } from "./firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
         import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
         initTheme();
@@ -84,17 +98,21 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
+            document.getElementById("user-display-email").innerText = user.email;
             const workspace = localStorage.getItem("workspace") || "empresa";
             await loadData(user.uid, workspace);
         });
 
         async function loadData(uid, workspace) {
-            const docSnap = await getDoc(doc(db, "users", uid, "workspaces", workspace));
-            if (docSnap.exists()) state.categorias = docSnap.data().categorias || [];
-            const txSnapshot = await getDocs(collection(db, "users", uid, "workspaces", workspace, "transacoes"));
-            state.transacoes = [];
-            txSnapshot.forEach(doc => state.transacoes.push(doc.data()));
-            calculateKPIs(); renderCharts();
+            try {
+                const docSnap = await getDoc(doc(db, "users", uid, "workspaces", workspace));
+                if (docSnap.exists()) state.categorias = docSnap.data().categorias || [];
+                const txSnapshot = await getDocs(collection(db, "users", uid, "workspaces", workspace, "transacoes"));
+                state.transacoes = [];
+                txSnapshot.forEach(doc => state.transacoes.push(doc.data()));
+                
+                calculateKPIs(); renderCharts();
+            } catch(e) { console.error(e); }
         }
 
         function calculateKPIs() {
@@ -112,7 +130,6 @@
             if (charts.global) charts.global.destroy();
             if (charts.categorias) charts.categorias.destroy();
 
-            // Chart Linhas
             const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
             let recMes = Array(12).fill(0), despMes = Array(12).fill(0);
             state.transacoes.forEach(t => {
@@ -122,13 +139,12 @@
             charts.global = new Chart(document.getElementById("canvas-chart-global"), {
                 type: 'line',
                 data: { labels: meses, datasets: [
-                    { label: "Receitas", data: recMes, borderColor: "#22c55e", tension: 0.3 },
-                    { label: "Despesas", data: despMes, borderColor: "#ef4444", tension: 0.3 }
+                    { label: "Receitas", data: recMes, borderColor: "#22c55e", borderWidth: 3, tension: 0.2 },
+                    { label: "Despesas", data: despMes, borderColor: "#ef4444", borderWidth: 3, tension: 0.2 }
                 ]},
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Chart Pizza
             const cDesp = state.categorias.filter(c => c.tipo === "despesa");
             charts.categorias = new Chart(document.getElementById("canvas-chart-categorias"), {
                 type: 'pie',
@@ -138,6 +154,7 @@
         };
 
         window.toggleTheme = () => document.documentElement.classList.toggle("dark");
+        window.handleLogout = async () => await signOut(auth);
     </script>
 </body>
 </html>
